@@ -1,20 +1,13 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
 import unittest
 
-from pydocx.util.xml import xml_tag_split
 from pydocx.openxml.packaging import MainDocumentPart, WordprocessingDocument
+from pydocx.util.xml import xml_tag_split
 
 
 class WordprocessingDocumentTestCase(unittest.TestCase):
     def setUp(self):
         self.document = WordprocessingDocument(
-            path='tests/fixtures/no_break_hyphen.docx',
+            path="tests/fixtures/no_break_hyphen.docx",
         )
 
     def test_document_is_the_open_xml_package(self):
@@ -34,7 +27,7 @@ class WordprocessingDocumentTestCase(unittest.TestCase):
     def test_main_document_part_uri(self):
         self.assertEqual(
             self.document.main_document_part.uri,
-            '/word/document.xml',
+            "/word/document.xml",
         )
 
     def test_main_document_part_root(self):
@@ -43,7 +36,7 @@ class WordprocessingDocumentTestCase(unittest.TestCase):
         )
         # We're currently ignoring namespaces, so this comes back as none
         self.assertEqual(namespace, None)
-        self.assertEqual(tag, 'document')
+        self.assertEqual(tag, "document")
 
     def test_main_document_part_relationship_uri(self):
         part = self.document.package.get_part(
@@ -51,21 +44,21 @@ class WordprocessingDocumentTestCase(unittest.TestCase):
         )
         self.assertEqual(
             part.relationship_uri,
-            '/word/_rels/document.xml.rels',
+            "/word/_rels/document.xml.rels",
         )
 
     def test_main_document_part_styles_uri(self):
         styles = self.document.main_document_part.style_definitions_part
         self.assertEqual(
             styles.uri,
-            '/word/styles.xml',
+            "/word/styles.xml",
         )
 
     def test_main_document_part_font_table_uri(self):
         font_table = self.document.main_document_part.font_table_part
         self.assertEqual(
             font_table.uri,
-            '/word/fontTable.xml',
+            "/word/fontTable.xml",
         )
 
     def test_nonexistent_numbering_definitions_part(self):
@@ -75,8 +68,8 @@ class WordprocessingDocumentTestCase(unittest.TestCase):
 
     def test_image_parts(self):
         image_document = WordprocessingDocument(
-            path='tests/fixtures/has_image.docx',
+            path="tests/fixtures/has_image.docx",
         )
         parts = image_document.main_document_part.image_parts
         self.assertEqual(len(parts), 1)
-        self.assertEqual(parts[0].uri, '/word/media/image1.gif')
+        self.assertEqual(parts[0].uri, "/word/media/image1.gif")

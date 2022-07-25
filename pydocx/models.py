@@ -1,10 +1,3 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
 import importlib
 import inspect
 from collections import defaultdict
@@ -15,8 +8,8 @@ except NameError:
     unicode_string = str
 
 
-def force_unicode(string, encoding='utf-8'):
-    '''
+def force_unicode(string, encoding="utf-8"):
+    """
     Given a string, return the unicode equivalent if possible. For python3+,
     this means just returning the string unchanged. For python2, if the string
     is already unicode, the string is also returned unchanged. Otherwise, the
@@ -25,7 +18,7 @@ def force_unicode(string, encoding='utf-8'):
     >>> force_unicode(None)
     >>> force_unicode('foo') == 'foo'
     True
-    '''
+    """
     if string is None:
         return
     if isinstance(string, unicode_string):
@@ -42,9 +35,10 @@ class XmlRootElementMismatchException(XmlException):
 
 
 class XmlField(object):
-    '''
+    """
     Represents a generic XML field which can be an attribute or tag.
-    '''
+    """
+
     def __init__(self, name=None, default=None, type=None):
         self.name = name
         self.default = default
@@ -52,25 +46,27 @@ class XmlField(object):
 
 
 class XmlAttribute(XmlField):
-    '''
+    """
     Represents that the field to be processed is an attribute
-    '''
+    """
+
     pass
 
 
 class XmlChild(XmlField):
-    '''
+    """
     Represents that the field to be processed is a child
-    '''
+    """
+
     def __init__(self, name=None, default=None, type=None, attrname=None):
-        '''
+        """
         If specified, `name` indicates the XML tag name.
         If specified, `default` indicates the value of the field if the tag
         isn't present.
         If specified, the raw XML value will be passed to `type`.
         If specified, `attrname` indicates that the value is stored in an
         attribute on the child.
-        '''
+        """
         super(XmlChild, self).__init__(
             name=name,
             default=default,
@@ -84,7 +80,7 @@ class XmlContent(XmlField):
 
 
 class XmlCollection(XmlField):
-    '''
+    """
     Represents an ordered collection of elements.
 
     To define a field of this type, pass in a sequence of tuples that specify
@@ -116,11 +112,11 @@ class XmlCollection(XmlField):
     optionally be a XmlModel.
 
     An instance of ParkingLot will have an attribute 'cars' that is a list.
-    '''
+    """
 
     def __init__(self, *types, **kwargs):
-        default = kwargs.pop('default', [])
-        self.allow_all_children = kwargs.pop('allow_all_children', False)
+        default = kwargs.pop("default", [])
+        self.allow_all_children = kwargs.pop("allow_all_children", False)
         super(XmlCollection, self).__init__(self, default=default)
         self._types = types
         self._name_to_type_map = None
@@ -130,18 +126,18 @@ class XmlCollection(XmlField):
         return set(self._set_types(*self._types))
 
     def _get_all_types(self):
-        base_path = 'pydocx.openxml.{0}'
+        base_path = "pydocx.openxml.{0}"
         roots = [
-            'drawing',
-            'markup_compatibility',
-            'vml',
-            'wordprocessing',
+            "drawing",
+            "markup_compatibility",
+            "vml",
+            "wordprocessing",
         ]
         for root in roots:
             module = importlib.import_module(base_path.format(root))
             for field_name in dir(module):
                 Field = getattr(module, field_name)
-                if hasattr(Field, 'XML_TAG'):
+                if hasattr(Field, "XML_TAG"):
                     yield Field
 
     def _set_types(self, *types):
@@ -149,11 +145,11 @@ class XmlCollection(XmlField):
             for Field in self._get_all_types():
                 yield Field
             return
-        base_path = 'pydocx.openxml.{0}'
-        types = list(types) + ['markup_compatibility.AlternateContent']
+        base_path = "pydocx.openxml.{0}"
+        types = list(types) + ["markup_compatibility.AlternateContent"]
         for _type in types:
             try:
-                path, klass = _type.rsplit('.', 1)
+                path, klass = _type.rsplit(".", 1)
             except AttributeError:
                 # This is a class, not a string
                 yield _type
@@ -171,7 +167,7 @@ class XmlCollection(XmlField):
                     tag_name, model = type_spec
                 else:
                     model = type_spec
-                    tag_name = getattr(model, 'XML_TAG')
+                    tag_name = getattr(model, "XML_TAG")
                 name_to_type_map[tag_name] = model
             self._name_to_type_map = name_to_type_map
         return self._name_to_type_map
@@ -203,26 +199,22 @@ class XmlModel(object):
     person = Person.load(xml)
     '''
 
-    def __init__(
-        self,
-        parent=None,
-        **kwargs
-    ):
+    def __init__(self, parent=None, **kwargs):
         for field_name, field in self.__class__.__dict__.items():
             if isinstance(field, XmlField):
                 # TODO field.default may only refer to the attr, and not if the
                 # field itself is missing
                 value = kwargs.get(field_name, field.default)
-                if hasattr(value, 'parent'):
+                if hasattr(value, "parent"):
                     value.parent = self
                 if isinstance(field, XmlCollection):
                     for item in value:
-                        if hasattr(item, 'parent'):
+                        if hasattr(item, "parent"):
                             item.parent = self
                 setattr(self, field_name, value)
 
         self._parent = parent
-        self.container = kwargs.get('container')
+        self.container = kwargs.get("container")
 
     @property
     def parent(self):
@@ -248,21 +240,24 @@ class XmlModel(object):
             return ancestor
 
     def __repr__(self):
-        return '{klass}({kwargs})'.format(
+        return "{klass}({kwargs})".format(
             klass=self.__class__.__name__,
-            kwargs=', '.join('{field}={value}'.format(
-                field=field,
-                value=repr(value),
-            ) for field, value in self.fields),
+            kwargs=", ".join(
+                "{field}={value}".format(
+                    field=field,
+                    value=repr(value),
+                )
+                for field, value in self.fields
+            ),
         )
 
     @property
     def fields(self):
-        '''
+        """
         A generator that loops through each of the defined fields for the
         model, and yields back only those fields which have been set to a value
         that isn't the field's default.
-        '''
+        """
         for field_name, field in self.__class__.__dict__.items():
             if isinstance(field, XmlField):
                 value = getattr(self, field_name, field.default)
@@ -271,11 +266,11 @@ class XmlModel(object):
 
     @classmethod
     def load(cls, element, **load_kwargs):
-        xml_tag_decl = getattr(cls, 'XML_TAG', None)
+        xml_tag_decl = getattr(cls, "XML_TAG", None)
         if element is not None and xml_tag_decl:
             if xml_tag_decl != element.tag:
                 raise XmlRootElementMismatchException(
-                    'Expected root element {tag} but got {other} instead'.format(  # noqa
+                    "Expected root element {tag} but got {other} instead".format(  # noqa
                         tag=xml_tag_decl,
                         other=element.tag,
                     ),
@@ -333,6 +328,7 @@ class XmlModel(object):
                             return field.type.load(value, **load_kwargs)
                     return field.type(value)
                 return value
+
             return child_handler
 
         # Evaluate the child tags
@@ -345,7 +341,7 @@ class XmlModel(object):
             if field.name is not None:
                 tag_name = field.name
             elif field.type:
-                field_type_tag = getattr(field.type, 'XML_TAG', None)
+                field_type_tag = getattr(field.type, "XML_TAG", None)
                 if field_type_tag:
                     tag_name = field_type_tag
 

@@ -1,26 +1,15 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-from pydocx.models import XmlModel, XmlCollection, XmlAttribute
+from pydocx.models import XmlAttribute, XmlCollection, XmlModel
 from pydocx.openxml.vml.image_data import ImageData
 
 
 class Rect(XmlModel):
-    XML_TAG = 'rect'
+    XML_TAG = "rect"
 
     style = XmlAttribute()
-    children = XmlCollection(ImageData, 'vml.Textbox')
+    children = XmlCollection(ImageData, "vml.Textbox")
 
     # TODO perhaps we could have a prepare_style, or clean_style convention?
     def get_style(self):
         if self.style:
-            return dict(
-                item.split(':', 1)
-                for item in self.style.split(';')
-                if item
-            )
+            return dict(item.split(":", 1) for item in self.style.split(";") if item)
         return {}

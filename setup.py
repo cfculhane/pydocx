@@ -1,16 +1,17 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import codecs
+import os
 import re
 
 try:
-    from setuptools import setup, find_packages
+    from setuptools import find_packages, setup
 except ImportError:
     from ez_setup import use_setuptools
+
     use_setuptools()
-    from setuptools import setup, find_packages  # noqa
+    from setuptools import find_packages, setup  # noqa
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -18,7 +19,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 def read(*parts):
     # intentionally *not* adding an encoding option to open, See:
     # https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
-    return codecs.open(os.path.join(here, *parts), 'r').read()
+    return codecs.open(os.path.join(here, *parts), "r").read()
 
 
 def find_version(*file_paths):
@@ -36,7 +37,7 @@ def find_version(*file_paths):
 def main():
     setup(
         name="PyDocX",
-        version=find_version('pydocx', '__init__.py'),
+        version=find_version("pydocx", "__init__.py"),
         description="docx (OOXML) to html converter",
         author="Jason Ward, Sam Portnow",
         author_email="jason.louard.ward@gmail.com, samson91787@gmail.com",
@@ -45,8 +46,8 @@ def main():
         license="Apache",
         packages=find_packages(),
         package_data={
-            'pydocx': [
-                'tests/templates/*.xml',
+            "pydocx": [
+                "tests/templates/*.xml",
             ],
         },
         scripts=[],
@@ -61,18 +62,18 @@ def main():
             "Programming Language :: Python :: 3.4",
             "Programming Language :: Python :: Implementation :: PyPy",
             "Intended Audience :: Developers",
-            "License :: OSI Approved :: Apache Software License"
-            "Operating System :: OS Independent",
+            "License :: OSI Approved :: Apache Software License" "Operating System :: OS Independent",
             "Topic :: Text Processing :: Markup :: HTML",
             "Topic :: Text Processing :: Markup :: XML",
         ],
-        long_description=read('README.rst'),
+        long_description=read("README.rst"),
         entry_points={
-            'console_scripts': [
-                'pydocx = pydocx.__main__:cli',
+            "console_scripts": [
+                "pydocx = pydocx.__main__:cli",
             ],
         },
     )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

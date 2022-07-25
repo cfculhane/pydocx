@@ -1,11 +1,3 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-
 class FakedSuperscriptAndSubscriptExportMixin(object):
     def get_run_styles_to_apply(self, run):
         # a run is a faked subscript/superscript if the local size is smaller,

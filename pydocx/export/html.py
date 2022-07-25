@@ -1,27 +1,20 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
-
 import base64
 import posixpath
 from itertools import chain
 
 from pydocx.constants import (
+    EMUS_PER_PIXEL,
     JUSTIFY_CENTER,
     JUSTIFY_LEFT,
     JUSTIFY_RIGHT,
     POINTS_PER_EM,
     PYDOCX_STYLES,
     TWIPS_PER_POINT,
-    EMUS_PER_PIXEL
 )
 from pydocx.export.base import PyDocXExporter
 from pydocx.export.numbering_span import NumberingItem
 from pydocx.openxml import wordprocessing
+from pydocx.openxml.wordprocessing import Paragraph
 from pydocx.util.uri import uri_is_external
 from pydocx.util.xml import (
     convert_dictionary_to_html_attributes,
@@ -30,10 +23,10 @@ from pydocx.util.xml import (
 
 
 def convert_twips_to_ems(value):
-    '''
+    """
     >>> convert_twips_to_ems(30)
     0.125
-    '''
+    """
     return value / TWIPS_PER_POINT / POINTS_PER_EM
 
 
@@ -42,10 +35,10 @@ def convert_emus_to_pixels(emus):
 
 
 def get_first_from_sequence(sequence, default=None):
-    '''
+    """
     Given a sequence, return the first item in the sequence. If the sequence is
     empty, return the passed in default.
-    '''
+    """
     first_result = default
     try:
         first_result = next(sequence)
@@ -55,22 +48,22 @@ def get_first_from_sequence(sequence, default=None):
 
 
 def is_only_whitespace(obj):
-    '''
+    """
     If the obj has `strip` return True if calling strip on the obj results in
     an empty instance. Otherwise, return False.
-    '''
-    if hasattr(obj, 'strip'):
+    """
+    if hasattr(obj, "strip"):
         return not obj.strip()
     return False
 
 
 def is_not_empty_and_not_only_whitespace(gen):
-    '''
+    """
     Determine if a generator is empty, or consists only of whitespace.
 
     If the generator is non-empty, return the original generator. Otherwise,
     return None
-    '''
+    """
     queue = []
     if gen is None:
         return
@@ -93,16 +86,9 @@ def is_not_empty_and_not_only_whitespace(gen):
 
 
 class HtmlTag(object):
-    closed_tag_format = '</{tag}>'
+    closed_tag_format = "</{tag}>"
 
-    def __init__(
-            self,
-            tag,
-            allow_self_closing=False,
-            closed=False,
-            allow_whitespace=False,
-            **attrs
-    ):
+    def __init__(self, tag, allow_self_closing=False, closed=False, allow_whitespace=False, **attrs):
         self.tag = tag
         self.allow_self_closing = allow_self_closing
         self.attrs = attrs
@@ -138,17 +124,17 @@ class HtmlTag(object):
             return self.closed_tag_format.format(tag=self.tag)
         else:
             attrs = self.get_html_attrs()
-            end_bracket = '>'
+            end_bracket = ">"
             if self.allow_self_closing:
-                end_bracket = ' />'
+                end_bracket = " />"
             if attrs:
-                return '<{tag} {attrs}{end}'.format(
+                return "<{tag} {attrs}{end}".format(
                     tag=self.tag,
                     attrs=attrs,
                     end=end_bracket,
                 )
             else:
-                return '<{tag}{end}'.format(tag=self.tag, end=end_bracket)
+                return "<{tag}{end}".format(tag=self.tag, end=end_bracket)
 
     def get_html_attrs(self):
         return convert_dictionary_to_html_attributes(self.attrs)
@@ -160,59 +146,64 @@ class PyDocXHTMLExporter(PyDocXExporter):
         self.table_cell_rowspan_tracking = {}
         self.in_table_cell = False
         self.heading_level_conversion_map = {
-            'heading 1': 'h1',
-            'heading 2': 'h2',
-            'heading 3': 'h3',
-            'heading 4': 'h4',
-            'heading 5': 'h5',
-            'heading 6': 'h6',
+            "heading 1": "h1",
+            "heading 2": "h2",
+            "heading 3": "h3",
+            "heading 4": "h4",
+            "heading 5": "h5",
+            "heading 6": "h6",
         }
-        self.default_heading_level = 'h6'
+        self.default_heading_level = "h6"
 
     def head(self):
-        tag = HtmlTag('head')
+        tag = HtmlTag("head")
         results = chain(self.meta(), self.style())
         return tag.apply(results)
 
     def style(self):
         styles = {
-            'body': {
-                'margin': '0px auto',
+            "body": {
+                "margin": "0px auto",
             }
         }
 
         if self.page_width:
             width = self.page_width / POINTS_PER_EM
-            styles['body']['width'] = '%.2fem' % width
+            styles["body"]["width"] = "%.2fem" % width
 
         result = []
         for name, definition in sorted(PYDOCX_STYLES.items()):
-            result.append('.pydocx-%s {%s}' % (
-                name,
-                convert_dictionary_to_style_fragment(definition),
-            ))
+            result.append(
+                ".pydocx-%s {%s}"
+                % (
+                    name,
+                    convert_dictionary_to_style_fragment(definition),
+                )
+            )
 
         for name, definition in sorted(styles.items()):
-            result.append('%s {%s}' % (
-                name,
-                convert_dictionary_to_style_fragment(definition),
-            ))
+            result.append(
+                "%s {%s}"
+                % (
+                    name,
+                    convert_dictionary_to_style_fragment(definition),
+                )
+            )
 
-        tag = HtmlTag('style')
-        return tag.apply(''.join(result))
+        tag = HtmlTag("style")
+        return tag.apply("".join(result))
 
     def meta(self):
-        yield HtmlTag('meta', charset='utf-8', allow_self_closing=True)
+        yield HtmlTag("meta", charset="utf-8", allow_self_closing=True)
 
     def export(self):
-        return ''.join(
-            result.to_html() if isinstance(result, HtmlTag)
-            else result
+        return "".join(
+            result.to_html() if isinstance(result, HtmlTag) else result
             for result in super(PyDocXHTMLExporter, self).export()
         )
 
     def export_document(self, document):
-        tag = HtmlTag('html')
+        tag = HtmlTag("html")
         results = super(PyDocXHTMLExporter, self).export_document(document)
         sequence = []
         head = self.head()
@@ -224,7 +215,7 @@ class PyDocXHTMLExporter(PyDocXExporter):
 
     def export_body(self, body):
         results = super(PyDocXHTMLExporter, self).export_body(body)
-        tag = HtmlTag('body')
+        tag = HtmlTag("body")
         return tag.apply(chain(results, self.footer()))
 
     def footer(self):
@@ -234,17 +225,17 @@ class PyDocXHTMLExporter(PyDocXExporter):
     def export_footnotes(self):
         results = super(PyDocXHTMLExporter, self).export_footnotes()
         attrs = {
-            'class': 'pydocx-list-style-type-decimal',
+            "class": "pydocx-list-style-type-decimal",
         }
-        ol = HtmlTag('ol', **attrs)
+        ol = HtmlTag("ol", **attrs)
         results = ol.apply(results, allow_empty=False)
 
-        page_break = HtmlTag('hr', allow_self_closing=True)
+        page_break = HtmlTag("hr", allow_self_closing=True)
         return page_break.apply(results, allow_empty=False)
 
     def export_footnote(self, footnote):
         results = super(PyDocXHTMLExporter, self).export_footnote(footnote)
-        tag = HtmlTag('li')
+        tag = HtmlTag("li")
         return tag.apply(results, allow_empty=False)
 
     def get_paragraph_tag(self, paragraph):
@@ -259,12 +250,12 @@ class PyDocXHTMLExporter(PyDocXExporter):
             return
         if isinstance(paragraph.parent, NumberingItem):
             return
-        return HtmlTag('p')
+        return HtmlTag("p")
 
     def get_heading_tag(self, paragraph):
         if paragraph.has_ancestor(NumberingItem):
             # Force-bold headings that appear in list items
-            return HtmlTag('strong')
+            return HtmlTag("strong")
         heading_style = paragraph.heading_style
         tag = self.heading_level_conversion_map.get(
             heading_style.name.lower(),
@@ -295,20 +286,20 @@ class PyDocXHTMLExporter(PyDocXExporter):
         # TODO These alignment values are for traditional conformance. Strict
         # conformance uses different values
         if alignment in [JUSTIFY_LEFT, JUSTIFY_CENTER, JUSTIFY_RIGHT]:
-            pydocx_class = 'pydocx-{alignment}'.format(
+            pydocx_class = "pydocx-{alignment}".format(
                 alignment=alignment,
             )
             attrs = {
-                'class': pydocx_class,
+                "class": pydocx_class,
             }
-            tag = HtmlTag('span', **attrs)
+            tag = HtmlTag("span", **attrs)
             results = tag.apply(results, allow_empty=False)
         elif alignment is not None:
             # TODO What if alignment is something else?
             pass
         return results
 
-    def export_paragraph_property_indentation(self, paragraph, results):
+    def export_paragraph_property_indentation(self, paragraph: Paragraph, results):
         # TODO these classes should be applied on the paragraph, and not as
         # inline styles
 
@@ -327,62 +318,53 @@ class PyDocXHTMLExporter(PyDocXExporter):
                 listing_style = self.export_listing_paragraph_property_indentation(
                     paragraph,
                     paragraph_num_level.paragraph_properties,
-                    include_text_indent=True
+                    include_text_indent=True,
                 )
-                if 'text-indent' in listing_style and listing_style['text-indent'] != '0.00em':
-                    style['text-indent'] = listing_style['text-indent']
-                    style['display'] = 'inline-block'
+                if "text-indent" in listing_style and listing_style["text-indent"] != "0.00em":
+                    style["text-indent"] = listing_style["text-indent"]
+                    style["display"] = "inline-block"
         else:
-            indentation_left = properties.to_int('indentation_left')
-            indentation_first_line = properties.to_int('indentation_first_line')
+            indentation_left = properties.to_int("indentation_left")
+            indentation_first_line = properties.to_int("indentation_first_line")
 
-        indentation_right = properties.to_int('indentation_right')
+        indentation_right = properties.to_int("indentation_right")
 
         if indentation_right:
             right = convert_twips_to_ems(indentation_right)
-            style['margin-right'] = '{0:.2f}em'.format(right)
+            style["margin-right"] = "{0:.2f}em".format(right)
 
         if indentation_left:
             left = convert_twips_to_ems(indentation_left)
-            style['margin-left'] = '{0:.2f}em'.format(left)
+            style["margin-left"] = "{0:.2f}em".format(left)
 
         if indentation_first_line:
             first_line = convert_twips_to_ems(indentation_first_line)
-            style['text-indent'] = '{0:.2f}em'.format(first_line)
-            style['display'] = 'inline-block'
+            style["text-indent"] = "{0:.2f}em".format(first_line)
+            style["display"] = "inline-block"
 
         if style:
-            attrs = {
-                'style': convert_dictionary_to_style_fragment(style)
-            }
-            tag = HtmlTag('span', **attrs)
+            attrs = {"style": convert_dictionary_to_style_fragment(style)}
+            tag = HtmlTag("span", **attrs)
             results = tag.apply(results, allow_empty=False)
 
         return results
 
-    def export_listing_paragraph_property_indentation(
-            self,
-            paragraph,
-            level_properties,
-            include_text_indent=False
-    ):
+    def export_listing_paragraph_property_indentation(self, paragraph, level_properties, include_text_indent=False):
         style = {}
 
         if not level_properties or not paragraph.has_numbering_properties:
             return style
 
-        level_indentation_step = \
-            paragraph.numbering_definition.get_indentation_between_levels()
+        level_indentation_step = paragraph.numbering_definition.get_indentation_between_levels()
 
         paragraph_properties = paragraph.properties
 
-        level_ind_left = level_properties.to_int('indentation_left', default=0)
-        level_ind_hanging = level_properties.to_int('indentation_hanging', default=0)
+        level_ind_left = level_properties.to_int("indentation_left", default=0)
+        level_ind_hanging = level_properties.to_int("indentation_hanging", default=0)
 
-        paragraph_ind_left = paragraph_properties.to_int('indentation_left', default=0)
-        paragraph_ind_hanging = paragraph_properties.to_int('indentation_hanging', default=0)
-        paragraph_ind_first_line = paragraph_properties.to_int('indentation_first_line',
-                                                               default=0)
+        paragraph_ind_left = paragraph_properties.to_int("indentation_left", default=0)
+        paragraph_ind_hanging = paragraph_properties.to_int("indentation_hanging", default=0)
+        paragraph_ind_first_line = paragraph_properties.to_int("indentation_first_line", default=0)
 
         left = paragraph_ind_left or level_ind_left
         hanging = paragraph_ind_hanging or level_ind_hanging
@@ -401,7 +383,7 @@ class PyDocXHTMLExporter(PyDocXExporter):
 
         # Take into account that current span can have custom left margin
         if level_indentation_step > level_ind_hanging:
-            margin_left -= (level_indentation_step - level_ind_hanging)
+            margin_left -= level_indentation_step - level_ind_hanging
         else:
             margin_left -= level_indentation_step
 
@@ -414,16 +396,15 @@ class PyDocXHTMLExporter(PyDocXExporter):
                 # based on the parent item
                 parent_paragraph = paragraph.parent.numbering_span.parent.get_first_child()
 
-                parent_ind_left = parent_paragraph.get_indentation('indentation_left')
-                parent_ind_hanging = parent_paragraph.get_indentation('indentation_hanging')
-                parent_lvl_ind_hanging = parent_paragraph.get_indentation(
-                    'indentation_hanging')
+                parent_ind_left = parent_paragraph.get_indentation("indentation_left")
+                parent_ind_hanging = parent_paragraph.get_indentation("indentation_hanging")
+                parent_lvl_ind_hanging = parent_paragraph.get_indentation("indentation_hanging")
 
-                margin_left -= (parent_ind_left - parent_ind_hanging)
+                margin_left -= parent_ind_left - parent_ind_hanging
                 margin_left -= parent_lvl_ind_hanging
                 # To mimic the word way of setting first line, we need to move back(left) all
                 # elements by first_line value
-                margin_left -= parent_paragraph.get_indentation('indentation_first_line')
+                margin_left -= parent_paragraph.get_indentation("indentation_first_line")
             except AttributeError:
                 pass
 
@@ -433,7 +414,7 @@ class PyDocXHTMLExporter(PyDocXExporter):
 
         if margin_left:
             margin_left = convert_twips_to_ems(margin_left)
-            style['margin-left'] = '{0:.2f}em'.format(margin_left)
+            style["margin-left"] = "{0:.2f}em".format(margin_left)
 
         # we don't allow negative hanging
         if hanging < 0:
@@ -443,7 +424,7 @@ class PyDocXHTMLExporter(PyDocXExporter):
             if hanging is not None:
                 # Now, here we add the hanging as text-indent for the paragraph
                 hanging = convert_twips_to_ems(hanging)
-                style['text-indent'] = '{0:.2f}em'.format(hanging)
+                style["text-indent"] = "{0:.2f}em".format(hanging)
 
         return style
 
@@ -457,11 +438,13 @@ class PyDocXHTMLExporter(PyDocXExporter):
             yield result
 
     def get_run_styles_to_apply_for_heading(self, run):
-        allowed_handlers = set([
-            self.export_run_property_italic,
-            self.export_run_property_hidden,
-            self.export_run_property_vanish,
-        ])
+        allowed_handlers = set(
+            [
+                self.export_run_property_italic,
+                self.export_run_property_hidden,
+                self.export_run_property_vanish,
+            ]
+        )
 
         handlers = super(PyDocXHTMLExporter, self).get_run_styles_to_apply(run)
         for handler in handlers:
@@ -485,60 +468,60 @@ class PyDocXHTMLExporter(PyDocXExporter):
                 yield result
 
     def export_run_property_bold(self, run, results):
-        tag = HtmlTag('strong')
+        tag = HtmlTag("strong")
         return self.export_run_property(tag, run, results)
 
     def export_run_property_italic(self, run, results):
-        tag = HtmlTag('em')
+        tag = HtmlTag("em")
         return self.export_run_property(tag, run, results)
 
     def export_run_property_underline(self, run, results):
         attrs = {
-            'class': 'pydocx-underline',
+            "class": "pydocx-underline",
         }
-        tag = HtmlTag('span', **attrs)
+        tag = HtmlTag("span", **attrs)
         return self.export_run_property(tag, run, results)
 
     def export_run_property_caps(self, run, results):
         attrs = {
-            'class': 'pydocx-caps',
+            "class": "pydocx-caps",
         }
-        tag = HtmlTag('span', **attrs)
+        tag = HtmlTag("span", **attrs)
         return self.export_run_property(tag, run, results)
 
     def export_run_property_small_caps(self, run, results):
         attrs = {
-            'class': 'pydocx-small-caps',
+            "class": "pydocx-small-caps",
         }
-        tag = HtmlTag('span', **attrs)
+        tag = HtmlTag("span", **attrs)
         return self.export_run_property(tag, run, results)
 
     def export_run_property_dstrike(self, run, results):
         attrs = {
-            'class': 'pydocx-strike',
+            "class": "pydocx-strike",
         }
-        tag = HtmlTag('span', **attrs)
+        tag = HtmlTag("span", **attrs)
         return self.export_run_property(tag, run, results)
 
     def export_run_property_strike(self, run, results):
         attrs = {
-            'class': 'pydocx-strike',
+            "class": "pydocx-strike",
         }
-        tag = HtmlTag('span', **attrs)
+        tag = HtmlTag("span", **attrs)
         return self.export_run_property(tag, run, results)
 
     def export_run_property_vanish(self, run, results):
         attrs = {
-            'class': 'pydocx-hidden',
+            "class": "pydocx-hidden",
         }
-        tag = HtmlTag('span', **attrs)
+        tag = HtmlTag("span", **attrs)
         return self.export_run_property(tag, run, results)
 
     def export_run_property_hidden(self, run, results):
         attrs = {
-            'class': 'pydocx-hidden',
+            "class": "pydocx-hidden",
         }
-        tag = HtmlTag('span', **attrs)
+        tag = HtmlTag("span", **attrs)
         return self.export_run_property(tag, run, results)
 
     def export_run_property_vertical_align(self, run, results):
@@ -555,21 +538,19 @@ class PyDocXHTMLExporter(PyDocXExporter):
         return results
 
     def export_run_property_vertical_align_superscript(self, run, results):
-        tag = HtmlTag('sup')
+        tag = HtmlTag("sup")
         return tag.apply(results, allow_empty=False)
 
     def export_run_property_vertical_align_subscript(self, run, results):
-        tag = HtmlTag('sub')
+        tag = HtmlTag("sub")
         return tag.apply(results, allow_empty=False)
 
     def export_run_property_color(self, run, results):
         if run.properties is None or run.properties.color is None:
             return results
 
-        attrs = {
-            'style': 'color:#' + run.properties.color
-        }
-        tag = HtmlTag('span', **attrs)
+        attrs = {"style": "color:#" + run.properties.color}
+        tag = HtmlTag("span", **attrs)
         return self.export_run_property(tag, run, results)
 
     def export_text(self, text):
@@ -583,20 +564,20 @@ class PyDocXHTMLExporter(PyDocXExporter):
         # deleted run
         results = self.export_text(deleted_text)
         attrs = {
-            'class': 'pydocx-delete',
+            "class": "pydocx-delete",
         }
-        tag = HtmlTag('span', **attrs)
+        tag = HtmlTag("span", **attrs)
         return tag.apply(results, allow_empty=False)
 
     def get_hyperlink_tag(self, target_uri):
         if target_uri:
             href = self.escape(target_uri)
-            return HtmlTag('a', href=href)
+            return HtmlTag("a", href=href)
 
     def export_hyperlink(self, hyperlink):
         results = super(PyDocXHTMLExporter, self).export_hyperlink(hyperlink)
         if not hyperlink.target_uri and hyperlink.anchor:
-            tag = self.get_hyperlink_tag(target_uri='#' + hyperlink.anchor)
+            tag = self.get_hyperlink_tag(target_uri="#" + hyperlink.anchor)
         else:
             tag = self.get_hyperlink_tag(target_uri=hyperlink.target_uri)
         if tag:
@@ -612,9 +593,9 @@ class PyDocXHTMLExporter(PyDocXExporter):
 
     def get_break_tag(self, br):
         if br.is_page_break():
-            tag_name = 'hr'
+            tag_name = "hr"
         else:
-            tag_name = 'br'
+            tag_name = "br"
         return HtmlTag(
             tag_name,
             allow_whitespace=True,
@@ -627,7 +608,7 @@ class PyDocXHTMLExporter(PyDocXExporter):
             yield tag
 
     def get_table_tag(self, table):
-        return HtmlTag('table', border='1')
+        return HtmlTag("table", border="1")
 
     def export_table(self, table):
         table_cell_spans = table.calculate_table_cell_spans()
@@ -638,7 +619,7 @@ class PyDocXHTMLExporter(PyDocXExporter):
 
     def export_table_row(self, table_row):
         results = super(PyDocXHTMLExporter, self).export_table_row(table_row)
-        tag = HtmlTag('tr')
+        tag = HtmlTag("tr")
         return tag.apply(results)
 
     def export_table_cell(self, table_cell):
@@ -665,10 +646,10 @@ class PyDocXHTMLExporter(PyDocXExporter):
             rowspan = rowspan_counts.get(table_cell, 1)
             attrs = {}
             if colspan > 1:
-                attrs['colspan'] = colspan
+                attrs["colspan"] = colspan
             if rowspan > 1:
-                attrs['rowspan'] = rowspan
-            tag = HtmlTag('td', **attrs)
+                attrs["rowspan"] = rowspan
+            tag = HtmlTag("td", **attrs)
 
         numbering_spans = self.yield_numbering_spans(table_cell.children)
         results = self.yield_nested_with_line_breaks_between_paragraphs(
@@ -699,12 +680,12 @@ class PyDocXHTMLExporter(PyDocXExporter):
         attrs = {}
         if length and width:
             # The "width" in openxml is actually the height
-            width_px = '{px:.0f}px'.format(px=convert_emus_to_pixels(length))
-            height_px = '{px:.0f}px'.format(px=convert_emus_to_pixels(width))
-            attrs['width'] = width_px
-            attrs['height'] = height_px
+            width_px = "{px:.0f}px".format(px=convert_emus_to_pixels(length))
+            height_px = "{px:.0f}px".format(px=convert_emus_to_pixels(width))
+            attrs["width"] = width_px
+            attrs["height"] = height_px
         if rotate:
-            attrs['rotate'] = rotate
+            attrs["rotate"] = rotate
 
         tag = self.get_image_tag(image=image, **attrs)
         if tag:
@@ -719,8 +700,8 @@ class PyDocXHTMLExporter(PyDocXExporter):
             image.stream.seek(0)
             data = image.stream.read()
             _, filename = posixpath.split(image.uri)
-            extension = filename.split('.')[-1].lower()
-            b64_encoded_src = 'data:image/{ext};base64,{data}'.format(
+            extension = filename.split(".")[-1].lower()
+            b64_encoded_src = "data:image/{ext};base64,{data}".format(
                 ext=extension,
                 data=base64.b64encode(data).decode(),
             )
@@ -729,28 +710,21 @@ class PyDocXHTMLExporter(PyDocXExporter):
     def get_image_tag(self, image, width=None, height=None, rotate=None):
         image_src = self.get_image_source(image)
         if image_src:
-            attrs = {
-                'src': image_src
-            }
+            attrs = {"src": image_src}
             if width and height:
-                attrs['width'] = width
-                attrs['height'] = height
+                attrs["width"] = width
+                attrs["height"] = height
             if rotate:
-                attrs['style'] = 'transform: rotate(%sdeg);' % rotate
+                attrs["style"] = "transform: rotate(%sdeg);" % rotate
 
-            return HtmlTag(
-                'img',
-                allow_self_closing=True,
-                allow_whitespace=True,
-                **attrs
-            )
+            return HtmlTag("img", allow_self_closing=True, allow_whitespace=True, **attrs)
 
     def export_inserted_run(self, inserted_run):
         results = super(PyDocXHTMLExporter, self).export_inserted_run(inserted_run)
         attrs = {
-            'class': 'pydocx-insert',
+            "class": "pydocx-insert",
         }
-        tag = HtmlTag('span', **attrs)
+        tag = HtmlTag("span", **attrs)
         return tag.apply(results)
 
     def export_vml_image_data(self, image_data):
@@ -773,9 +747,9 @@ class PyDocXHTMLExporter(PyDocXExporter):
             footnote_reference,
         )
         footnote_id = footnote_reference.footnote_id
-        href = '#footnote-{fid}'.format(fid=footnote_id)
-        name = 'footnote-ref-{fid}'.format(fid=footnote_id)
-        tag = HtmlTag('a', href=href, name=name)
+        href = "#footnote-{fid}".format(fid=footnote_id)
+        name = "footnote-ref-{fid}".format(fid=footnote_id)
+        tag = HtmlTag("a", href=href, name=name)
         for result in tag.apply(results, allow_empty=False):
             yield result
 
@@ -790,31 +764,31 @@ class PyDocXHTMLExporter(PyDocXExporter):
         if not footnote_id:
             return
 
-        name = 'footnote-{fid}'.format(fid=footnote_id)
-        href = '#footnote-ref-{fid}'.format(fid=footnote_id)
-        tag = HtmlTag('a', href=href, name=name)
-        results = tag.apply(['^'])
+        name = "footnote-{fid}".format(fid=footnote_id)
+        href = "#footnote-ref-{fid}".format(fid=footnote_id)
+        tag = HtmlTag("a", href=href, name=name)
+        results = tag.apply(["^"])
         for result in results:
             yield result
 
     def export_tab_char(self, tab_char):
         results = super(PyDocXHTMLExporter, self).export_tab_char(tab_char)
         attrs = {
-            'class': 'pydocx-tab',
+            "class": "pydocx-tab",
         }
-        tag = HtmlTag('span', allow_whitespace=True, **attrs)
+        tag = HtmlTag("span", allow_whitespace=True, **attrs)
         return tag.apply(results)
 
     def export_numbering_span(self, numbering_span):
         results = super(PyDocXHTMLExporter, self).export_numbering_span(numbering_span)
-        pydocx_class = 'pydocx-list-style-type-{fmt}'.format(
+        pydocx_class = "pydocx-list-style-type-{fmt}".format(
             fmt=numbering_span.numbering_level.num_format,
         )
         attrs = {}
-        tag_name = 'ul'
+        tag_name = "ul"
         if not numbering_span.numbering_level.is_bullet_format():
-            attrs['class'] = pydocx_class
-            tag_name = 'ol'
+            attrs["class"] = pydocx_class
+            tag_name = "ol"
         tag = HtmlTag(tag_name, **attrs)
         return tag.apply(results)
 
@@ -827,21 +801,19 @@ class PyDocXHTMLExporter(PyDocXExporter):
         style = None
 
         if numbering_item.children:
-            level_properties = numbering_item.numbering_span.\
-                numbering_level.paragraph_properties
+            level_properties = numbering_item.numbering_span.numbering_level.paragraph_properties
             # get the first paragraph properties which will contain information
             # on how to properly indent listing item
             paragraph = numbering_item.children[0]
 
-            style = self.export_listing_paragraph_property_indentation(paragraph,
-                                                                       level_properties)
+            style = self.export_listing_paragraph_property_indentation(paragraph, level_properties)
 
         attrs = {}
 
         if style:
-            attrs['style'] = convert_dictionary_to_style_fragment(style)
+            attrs["style"] = convert_dictionary_to_style_fragment(style)
 
-        tag = HtmlTag('li', **attrs)
+        tag = HtmlTag("li", **attrs)
         return tag.apply(results)
 
     def export_field_hyperlink(self, simple_field, field_args):
@@ -854,10 +826,10 @@ class PyDocXHTMLExporter(PyDocXExporter):
         for arg in field_args:
             if bookmark_option is True:
                 bookmark = arg
-            if arg == '\l':
+            if arg == "\l":
                 bookmark_option = True
         if bookmark_option and bookmark:
-            target_uri = '{0}#{1}'.format(target_uri, bookmark)
+            target_uri = "{0}#{1}".format(target_uri, bookmark)
 
         tag = self.get_hyperlink_tag(target_uri=target_uri)
         return tag.apply(results)

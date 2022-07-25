@@ -5,8 +5,8 @@ from pydocx.openxml.vml.shape import Shape
 from pydocx.openxml.vml.textbox import Textbox
 
 __all__ = [
-    'ImageData',
-    'Rect',
-    'Shape',
-    'Textbox',
+    "ImageData",
+    "Rect",
+    "Shape",
+    "Textbox",
 ]

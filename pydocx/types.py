@@ -1,8 +1,4 @@
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
+from __future__ import absolute_import, print_function, unicode_literals
 
 
 class SimpleType(object):
@@ -14,7 +10,7 @@ class SimpleType(object):
 
 
 class OnOff(SimpleType):
-    '''
+    """
     http://www.schemacentral.com/sc/ooxml/t-w_ST_OnOff.html
 
     >>> bool(OnOff('true'))
@@ -35,15 +31,16 @@ class OnOff(SimpleType):
     False
     >>> bool(OnOff('none'))
     False
-    '''
-    ON_VALUES = ['true', 'on', '1']
+    """
+
+    ON_VALUES = ["true", "on", "1"]
 
     def __nonzero__(self):
         return not self.value or self.value in self.ON_VALUES
 
 
 class Underline(SimpleType):
-    '''
+    """
     http://www.schemacentral.com/sc/ooxml/t-w_ST_Underline.html
 
     >>> bool(Underline('none'))
@@ -52,8 +49,8 @@ class Underline(SimpleType):
     False
     >>> bool(Underline('single'))
     True
-    '''
+    """
 
     def __nonzero__(self):
-        OFF_VALUES = ['none', '', None]
+        OFF_VALUES = ["none", "", None]
         return self.value not in OFF_VALUES

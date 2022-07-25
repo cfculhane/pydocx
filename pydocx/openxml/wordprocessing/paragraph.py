@@ -1,26 +1,22 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-from pydocx.util.memoize import memoized
-from pydocx.models import XmlModel, XmlCollection, XmlChild
-from pydocx.openxml.wordprocessing.hyperlink import Hyperlink
-from pydocx.openxml.wordprocessing.paragraph_properties import ParagraphProperties  # noqa
-from pydocx.openxml.wordprocessing.run import Run
-from pydocx.openxml.wordprocessing.tab_char import TabChar
-from pydocx.openxml.wordprocessing.text import Text
-from pydocx.openxml.wordprocessing.smart_tag_run import SmartTagRun
-from pydocx.openxml.wordprocessing.inserted_run import InsertedRun
+from pydocx.models import XmlChild, XmlCollection, XmlModel
+from pydocx.openxml.wordprocessing.bookmark import Bookmark
 from pydocx.openxml.wordprocessing.deleted_run import DeletedRun
+from pydocx.openxml.wordprocessing.hyperlink import Hyperlink
+from pydocx.openxml.wordprocessing.inserted_run import InsertedRun
+from pydocx.openxml.wordprocessing.paragraph_properties import (  # noqa
+    ParagraphProperties,
+)
+from pydocx.openxml.wordprocessing.run import Run
 from pydocx.openxml.wordprocessing.sdt_run import SdtRun
 from pydocx.openxml.wordprocessing.simple_field import SimpleField
-from pydocx.openxml.wordprocessing.bookmark import Bookmark
+from pydocx.openxml.wordprocessing.smart_tag_run import SmartTagRun
+from pydocx.openxml.wordprocessing.tab_char import TabChar
+from pydocx.openxml.wordprocessing.text import Text
+from pydocx.util.memoize import memoized
 
 
 class Paragraph(XmlModel):
-    XML_TAG = 'p'
+    XML_TAG = "p"
 
     properties = XmlChild(type=ParagraphProperties)
 
@@ -32,7 +28,7 @@ class Paragraph(XmlModel):
         DeletedRun,
         SdtRun,
         SimpleField,
-        Bookmark
+        Bookmark,
     )
 
     def __init__(self, **kwargs):
@@ -53,6 +49,7 @@ class Paragraph(XmlModel):
 
     def has_structured_document_parent(self):
         from pydocx.openxml.wordprocessing import SdtBlock
+
         return self.has_ancestor(SdtBlock)
 
     def get_style_chain_stack(self):
@@ -66,16 +63,16 @@ class Paragraph(XmlModel):
         # TODO the getattr is necessary because of footnotes. From the context
         # of a footnote, a paragraph's container is the footnote part, which
         # doesn't have access to the style_definitions_part
-        part = getattr(self.container, 'style_definitions_part', None)
+        part = getattr(self.container, "style_definitions_part", None)
         if part:
-            style_stack = part.get_style_chain_stack('paragraph', parent_style)
+            style_stack = part.get_style_chain_stack("paragraph", parent_style)
             for result in style_stack:
                 yield result
 
     @property
     def heading_style(self):
-        if hasattr(self, '_heading_style'):
-            return getattr(self, '_heading_style')
+        if hasattr(self, "_heading_style"):
+            return getattr(self, "_heading_style")
         style_stack = self.get_style_chain_stack()
         heading_style = None
         for style in style_stack:
@@ -94,7 +91,7 @@ class Paragraph(XmlModel):
         # TODO the getattr is necessary because of footnotes. From the context
         # of a footnote, a paragraph's container is the footnote part, which
         # doesn't have access to the numbering_definitions_part
-        part = getattr(self.container, 'numbering_definitions_part', None)
+        part = getattr(self.container, "numbering_definitions_part", None)
         if not part:
             return
         if not self.effective_properties:
@@ -133,7 +130,7 @@ class Paragraph(XmlModel):
                 return p_child.name
 
     def get_text(self, tab_char=None):
-        '''
+        """
         Return a string of all of the contained Text nodes concatenated
         together. If `tab_char` is set, then any TabChar encountered will be
         represented in the returned text using the specified string.
@@ -152,7 +149,7 @@ class Paragraph(XmlModel):
             </p>
 
         `get_text()` will return 'abcdef'
-        '''
+        """
 
         text = []
         for run in self.runs:
@@ -162,12 +159,12 @@ class Paragraph(XmlModel):
                         text.append(r_child.text)
                 if tab_char and isinstance(r_child, TabChar):
                     text.append(tab_char)
-        return ''.join(text)
+        return "".join(text)
 
     def get_number_of_initial_tabs(self):
-        '''
+        """
         Return the number of initial TabChars.
-        '''
+        """
         tab_count = 0
         for p_child in self.children:
             if isinstance(p_child, Run):
@@ -183,7 +180,7 @@ class Paragraph(XmlModel):
     @property
     @memoized
     def has_numbering_properties(self):
-        return bool(getattr(self.properties, 'numbering_properties', None))
+        return bool(getattr(self.properties, "numbering_properties", None))
 
     @property
     @memoized
@@ -191,10 +188,10 @@ class Paragraph(XmlModel):
         return bool(self.numbering_definition)
 
     def get_indentation(self, indentation, only_level_ind=False):
-        '''
+        """
         Get specific indentation of the current paragraph. If indentation is
         not present on the paragraph level, get it from the numbering definition.
-        '''
+        """
 
         ind = None
 

@@ -1,21 +1,13 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-from pydocx.models import XmlAttribute, XmlModel, XmlCollection
+from pydocx.models import XmlAttribute, XmlCollection, XmlModel
 from pydocx.openxml.wordprocessing.run import Run
-
 from pydocx.util.memoize import memoized
 
 
 class Hyperlink(XmlModel):
-    XML_TAG = 'hyperlink'
+    XML_TAG = "hyperlink"
 
-    hyperlink_id = XmlAttribute(name='id')
-    anchor = XmlAttribute(name='anchor')
+    hyperlink_id = XmlAttribute(name="id")
+    anchor = XmlAttribute(name="anchor")
     children = XmlCollection(
         Run,
     )
@@ -35,7 +27,7 @@ class Hyperlink(XmlModel):
             return None
 
         if self.anchor:
-            return '{0}#{1}'.format(relationship.target_uri, self.anchor)
+            return "{0}#{1}".format(relationship.target_uri, self.anchor)
         else:
             return relationship.target_uri
 

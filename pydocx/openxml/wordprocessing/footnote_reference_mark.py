@@ -1,12 +1,5 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
 from pydocx.models import XmlModel
 
 
 class FootnoteReferenceMark(XmlModel):
-    XML_TAG = 'footnoteRef'
+    XML_TAG = "footnoteRef"

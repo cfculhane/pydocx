@@ -1,17 +1,10 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-from pydocx.models import XmlModel, XmlAttribute
+from pydocx.models import XmlAttribute, XmlModel
 
 
 class FootnoteReference(XmlModel):
-    XML_TAG = 'footnoteReference'
+    XML_TAG = "footnoteReference"
 
-    footnote_id = XmlAttribute(name='id')
+    footnote_id = XmlAttribute(name="id")
 
     @property
     def footnote(self):

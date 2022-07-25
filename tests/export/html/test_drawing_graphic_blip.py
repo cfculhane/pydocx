@@ -1,10 +1,6 @@
 # coding: utf-8
 
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
+from __future__ import absolute_import, print_function, unicode_literals
 
 import base64
 
@@ -21,7 +17,7 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
         width_px = 5
         height_px = 10
 
-        document_xml = '''
+        document_xml = """
             <p>
             <r>
               <t>Foo</t>
@@ -50,23 +46,23 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
               <t>Bar</t>
             </r>
             </p>
-        '''.format(
+        """.format(
             cx=width_px * EMUS_PER_PIXEL,
             cy=height_px * EMUS_PER_PIXEL,
         )
 
         document = WordprocessingDocumentFactory()
-        image_url = 'http://google.com/image1.gif'
+        image_url = "http://google.com/image1.gif"
         document_rels = document.relationship_format.format(
-            id='foobar',
+            id="foobar",
             type=ImagePart.relationship_type,
             target=image_url,
-            target_mode='External',
+            target_mode="External",
         )
 
         document.add(MainDocumentPart, document_xml, document_rels)
 
-        expected_html = '''
+        expected_html = """
             <p>
               Foo
               <img
@@ -76,7 +72,9 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
               />
               Bar
             </p>
-        '''.format(width=width_px, height=height_px)
+        """.format(
+            width=width_px, height=height_px
+        )
 
         self.assert_document_generates_html(document, expected_html)
 
@@ -86,7 +84,7 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
 
         # Ensure that the image size can be calculated correctly even if the
         # image size ext isn't the first ext in the drawing node
-        document_xml = '''
+        document_xml = """
             <p>
             <r>
               <t>Foo</t>
@@ -115,23 +113,23 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
               <t>Bar</t>
             </r>
             </p>
-        '''.format(
+        """.format(
             cx=width_px * EMUS_PER_PIXEL,
             cy=height_px * EMUS_PER_PIXEL,
         )
 
         document = WordprocessingDocumentFactory()
-        image_url = 'http://google.com/image1.gif'
+        image_url = "http://google.com/image1.gif"
         document_rels = document.relationship_format.format(
-            id='foobar',
+            id="foobar",
             type=ImagePart.relationship_type,
             target=image_url,
-            target_mode='External',
+            target_mode="External",
         )
 
         document.add(MainDocumentPart, document_xml, document_rels)
 
-        expected_html = '''
+        expected_html = """
             <p>
               Foo
               <img
@@ -141,14 +139,16 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
               />
               Bar
             </p>
-        '''.format(width=width_px, height=height_px)
+        """.format(
+            width=width_px, height=height_px
+        )
 
         self.assert_document_generates_html(document, expected_html)
 
     def test_anchor_with_no_size_ext(self):
         # Ensure the image html is still rendered even if the size cannot be
         # calculated
-        document_xml = '''
+        document_xml = """
             <p>
             <r>
               <t>Foo</t>
@@ -171,33 +171,33 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
               <t>Bar</t>
             </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
-        image_url = 'http://google.com/image1.gif'
+        image_url = "http://google.com/image1.gif"
         document_rels = document.relationship_format.format(
-            id='foobar',
+            id="foobar",
             type=ImagePart.relationship_type,
             target=image_url,
-            target_mode='External',
+            target_mode="External",
         )
 
         document.add(MainDocumentPart, document_xml, document_rels)
 
-        expected_html = '''
+        expected_html = """
             <p>
               Foo
               <img src="http://google.com/image1.gif" />
               Bar
             </p>
-        '''
+        """
 
         self.assert_document_generates_html(document, expected_html)
 
     def test_blip_embed_refers_to_undefined_image_relationship(self):
         # Ensure that if a blip embed refers to an undefined image
         # relationshipp, the image rendering is skipped
-        document_xml = '''
+        document_xml = """
             <p>
             <r>
               <t>Foo</t>
@@ -217,12 +217,12 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
               <t>Bar</t>
             </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>FooBar</p>'
+        expected_html = "<p>FooBar</p>"
 
         self.assert_document_generates_html(document, expected_html)
 
@@ -230,7 +230,7 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
         width_px = 5
         height_px = 10
 
-        document_xml = '''
+        document_xml = """
             <p>
             <r>
               <t>Foo</t>
@@ -255,24 +255,24 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
               <t>Bar</t>
             </r>
             </p>
-        '''.format(
+        """.format(
             cx=width_px * EMUS_PER_PIXEL,
             cy=height_px * EMUS_PER_PIXEL,
         )
 
         document = WordprocessingDocumentFactory()
         document_rels = document.relationship_format.format(
-            id='foobar',
+            id="foobar",
             type=ImagePart.relationship_type,
-            target='media/image1.jpeg',
-            target_mode='Internal',
+            target="media/image1.jpeg",
+            target_mode="Internal",
         )
 
         document.add(MainDocumentPart, document_xml, document_rels)
 
-        image_data = 'fake data'
+        image_data = "fake data"
 
-        expected_html = '''
+        expected_html = """
             <p>
               Foo
               <img
@@ -282,18 +282,18 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
               />
               Bar
             </p>
-        '''.format(
+        """.format(
             width=width_px,
             height=height_px,
             # This is kind of weird, needed otherwise python 3.3 breaks
-            data=base64.b64encode(image_data.encode('utf-8')).decode('utf-8'),
+            data=base64.b64encode(image_data.encode("utf-8")).decode("utf-8"),
         )
 
         self.assert_document_generates_html(
             document,
             expected_html,
             additional_parts={
-                'word/media/image1.jpeg': image_data,
+                "word/media/image1.jpeg": image_data,
             },
         )
 
@@ -301,7 +301,7 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
         width_px = 5
         height_px = 10
 
-        document_xml = '''
+        document_xml = """
             <p>
             <r>
               <t>Foo</t>
@@ -326,22 +326,22 @@ class DrawingGraphicBlipTestCase(DocumentGeneratorTestCase):
               <t>Bar</t>
             </r>
             </p>
-        '''.format(
+        """.format(
             cx=width_px * EMUS_PER_PIXEL,
             cy=height_px * EMUS_PER_PIXEL,
         )
 
         document = WordprocessingDocumentFactory()
         document_rels = document.relationship_format.format(
-            id='foobar',
+            id="foobar",
             type=ImagePart.relationship_type,
-            target='media/image1.jpeg',
-            target_mode='Internal',
+            target="media/image1.jpeg",
+            target_mode="Internal",
         )
 
         document.add(MainDocumentPart, document_xml, document_rels)
 
-        expected_html = '<p>FooBar</p>'
+        expected_html = "<p>FooBar</p>"
 
         self.assert_document_generates_html(
             document,

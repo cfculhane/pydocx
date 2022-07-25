@@ -10,14 +10,14 @@ from pydocx.openxml.drawing.wordprocessing.anchor import Anchor
 from pydocx.openxml.drawing.wordprocessing.inline import Inline
 
 __all__ = [
-    'Anchor',
-    'Blip',
-    'BlipFill',
-    'Extents',
-    'Graphic',
-    'GraphicData',
-    'Inline',
-    'Picture',
-    'ShapeProperties',
-    'Transform2D',
+    "Anchor",
+    "Blip",
+    "BlipFill",
+    "Extents",
+    "Graphic",
+    "GraphicData",
+    "Inline",
+    "Picture",
+    "ShapeProperties",
+    "Transform2D",
 ]

@@ -1,10 +1,6 @@
 # coding: utf-8
 
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
+from __future__ import absolute_import, print_function, unicode_literals
 
 import pytest
 
@@ -21,26 +17,26 @@ class XMLVulnerabilitiesTestCase(DocumentGeneratorTestCase):
             defusedxml = None
 
         if defusedxml is None:
-            raise pytest.skip('This test case only applies when using defusedxml')
+            raise pytest.skip("This test case only applies when using defusedxml")
 
-        document_xml = '''
+        document_xml = """
             <p>
               <r>
                 <t>&c;</t>
               </r>
             </p>
-        '''
-        xml_header = '''<?xml version="1.0" encoding="UTF-8"?>
+        """
+        xml_header = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml [
  <!ENTITY a "123">
  <!ENTITY b "&a;&a;">
  <!ENTITY c "&b;&b;">
 ]>
-        '''
+        """
         document = WordprocessingDocumentFactory(xml_header=xml_header)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>123123123123</p>'
+        expected_html = "<p>123123123123</p>"
         try:
             self.assert_document_generates_html(document, expected_html)
             raise AssertionError(
@@ -56,24 +52,24 @@ class XMLVulnerabilitiesTestCase(DocumentGeneratorTestCase):
             defusedxml = None
 
         if defusedxml is None:
-            raise pytest.skip('This test case only applies when using defusedxml')
+            raise pytest.skip("This test case only applies when using defusedxml")
 
-        document_xml = '''
+        document_xml = """
             <p>
               <r>
                 <t>&a;</t>
               </r>
             </p>
-        '''
-        xml_header = '''<?xml version="1.0" encoding="UTF-8"?>
+        """
+        xml_header = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml [
  <!ENTITY a "123">
 ]>
-        '''
+        """
         document = WordprocessingDocumentFactory(xml_header=xml_header)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>123</p>'
+        expected_html = "<p>123</p>"
         try:
             self.assert_document_generates_html(document, expected_html)
             raise AssertionError(

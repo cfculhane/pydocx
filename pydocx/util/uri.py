@@ -5,7 +5,7 @@ def uri_is_internal(uri):
     >>> uri_is_internal('http://google/images/image.png')
     False
     """
-    return uri.startswith('/')
+    return uri.startswith("/")
 
 
 def uri_is_external(uri):

@@ -1,8 +1,4 @@
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
+from __future__ import absolute_import, print_function, unicode_literals
 
 from pydocx.export.base import PyDocXExporter
 
@@ -12,21 +8,21 @@ class PyDocXMarkdownExporter(PyDocXExporter):
         return text
 
     def linebreak(self):
-        return '\n'
+        return "\n"
 
     def paragraph(self, text):
-        return text + '\n'
+        return text + "\n"
 
     def insertion(self, text, author, date):
         pass
 
     def bold(self, text):
-        return '**' + text + '**'
+        return "**" + text + "**"
 
     def italics(self, text):
         # TODO do we need a "pre" variable, so I can check for
         # *italics**italics* and turn it into *italicsitatlics*?
-        return '*' + text + '*'
+        return "*" + text + "*"
 
     def underline(self, text):
-        return '***' + text + '***'
+        return "***" + text + "***"

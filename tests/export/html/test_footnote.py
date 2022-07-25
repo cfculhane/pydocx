@@ -1,11 +1,6 @@
 # coding: utf-8
 
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
+from __future__ import absolute_import, print_function, unicode_literals
 
 from pydocx.openxml.packaging import FootnotesPart, MainDocumentPart
 from pydocx.test import DocumentGeneratorTestCase
@@ -14,7 +9,7 @@ from pydocx.test.utils import WordprocessingDocumentFactory
 
 class FootnoteTestCase(DocumentGeneratorTestCase):
     def test_footnote_without_definition_is_ignored(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <r>
                 <t>Foo</t>
@@ -23,15 +18,15 @@ class FootnoteTestCase(DocumentGeneratorTestCase):
                 <footnoteReference id="abc"/>
               </r>
             </p>
-        '''
+        """
         document = WordprocessingDocumentFactory()
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>Foo</p>'
+        expected_html = "<p>Foo</p>"
         self.assert_document_generates_html(document, expected_html)
 
     def test_basic_footnote_with_styling(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <r>
                 <t>Foo</t>
@@ -48,9 +43,9 @@ class FootnoteTestCase(DocumentGeneratorTestCase):
                 <t>Footnotes should appear below this</t>
               </r>
             </p>
-        '''
+        """
 
-        footnotes_xml = '''
+        footnotes_xml = """
             <footnote id="abc">
               <p>
                 <r>
@@ -62,13 +57,13 @@ class FootnoteTestCase(DocumentGeneratorTestCase):
                 </r>
               </p>
             </footnote>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(FootnotesPart, footnotes_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '''
+        expected_html = """
             <p>
                 Foo
                 <sup>
@@ -83,11 +78,11 @@ class FootnoteTestCase(DocumentGeneratorTestCase):
                     Bar
                 </strong></p></li>
             </ol>
-        '''
+        """
         self.assert_document_generates_html(document, expected_html)
 
     def test_footnote_with_hyperlink(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <r>
                 <t>Foo</t>
@@ -104,9 +99,9 @@ class FootnoteTestCase(DocumentGeneratorTestCase):
                 <t>Footnotes should appear below this</t>
               </r>
             </p>
-        '''
+        """
 
-        footnotes_xml = '''
+        footnotes_xml = """
             <footnote id="abc">
               <p>
                 <r>
@@ -119,21 +114,21 @@ class FootnoteTestCase(DocumentGeneratorTestCase):
                 </hyperlink>
               </p>
             </footnote>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
 
         footnotes_rels = document.relationship_format.format(
-            id='foobar',
-            type='foo/hyperlink',
-            target='http://google.com',
-            target_mode='External',
+            id="foobar",
+            type="foo/hyperlink",
+            target="http://google.com",
+            target_mode="External",
         )
 
         document.add(FootnotesPart, footnotes_xml, footnotes_rels)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '''
+        expected_html = """
             <p>
                 Foo
                 <sup>
@@ -150,11 +145,11 @@ class FootnoteTestCase(DocumentGeneratorTestCase):
                     </p>
                 </li>
             </ol>
-        '''
+        """
         self.assert_document_generates_html(document, expected_html)
 
     def test_multiple_footnotes_defined_in_a_order_different_from_usage(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <r>
                 <t>Foo</t>
@@ -189,9 +184,9 @@ class FootnoteTestCase(DocumentGeneratorTestCase):
                 <t>Footnotes should appear below this</t>
               </r>
             </p>
-        '''
+        """
 
-        footnotes_xml = '''
+        footnotes_xml = """
             <footnote id="two">
               <p>
                 <r>
@@ -216,13 +211,13 @@ class FootnoteTestCase(DocumentGeneratorTestCase):
                 </r>
               </p>
             </footnote>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(FootnotesPart, footnotes_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '''
+        expected_html = """
             <p>
                 Foo
                 <sup>
@@ -253,5 +248,5 @@ class FootnoteTestCase(DocumentGeneratorTestCase):
                     Gamma
                 </p></li>
             </ol>
-        '''
+        """
         self.assert_document_generates_html(document, expected_html)

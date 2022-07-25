@@ -3,5 +3,5 @@ from pydocx.export.mixins.faked_superscript_and_subscript import (
 )
 
 __all__ = [
-    'FakedSuperscriptAndSubscriptExportMixin',
+    "FakedSuperscriptAndSubscriptExportMixin",
 ]

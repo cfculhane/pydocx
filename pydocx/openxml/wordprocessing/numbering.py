@@ -1,17 +1,10 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-from pydocx.models import XmlModel, XmlCollection
+from pydocx.models import XmlCollection, XmlModel
 from pydocx.openxml.wordprocessing.abstract_num import AbstractNum
 from pydocx.openxml.wordprocessing.numbering_instance import NumberingInstance
 
 
 class Numbering(XmlModel):
-    XML_TAG = 'numbering'
+    XML_TAG = "numbering"
 
     elements = XmlCollection(AbstractNum, NumberingInstance)
 
@@ -28,7 +21,7 @@ class Numbering(XmlModel):
                 self._nums[el.num_id] = el
             else:
                 raise AssertionError(
-                    'Unexpected element type {type} encountered'.format(
+                    "Unexpected element type {type} encountered".format(
                         type=el.__class__.__name__,
                     )
                 )

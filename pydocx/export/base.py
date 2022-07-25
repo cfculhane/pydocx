@@ -1,12 +1,5 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
-
 import xml.sax.saxutils
+from typing import Callable, Iterable
 
 from pydocx.constants import TWIPS_PER_POINT
 from pydocx.exceptions import MalformedDocxException
@@ -73,7 +66,7 @@ class PyDocXExporter(object):
             wordprocessing.TxBxContent: self.export_textbox_content,
         }
         self.field_type_to_export_func_map = {
-            'HYPERLINK': getattr(self, 'export_field_hyperlink', None),
+            "HYPERLINK": getattr(self, "export_field_hyperlink", None),
         }
 
     @property
@@ -234,7 +227,7 @@ class PyDocXExporter(object):
         except AttributeError:
             page_size = None
         if page_size:
-            width = page_size.get('w')
+            width = page_size.get("w")
             if not width:
                 return
             try:
@@ -247,16 +240,16 @@ class PyDocXExporter(object):
     def export_document(self, document):
         return self.export_node(document.body)
 
-    def yield_nested(self, iterable, func):
+    def yield_nested(self, iterable: Iterable, func: Callable):
         for item in iterable:
             for result in func(item):
                 yield result
 
     def yield_nested_with_line_breaks_between_paragraphs(self, iterable, func):
-        '''
+        """
         Yield a line break in between adjacent paragraphs, ignoring any
         paragraphs that are empty or otherwise don't contain any content.
-        '''
+        """
         br = wordprocessing.Break()
 
         previous_was_paragraph = False
@@ -412,7 +405,7 @@ class PyDocXExporter(object):
 
     def export_text(self, text):
         if not text.text:
-            yield ''
+            yield ""
         else:
             # TODO should we do this here, or in the HTML exporter?
             yield self.escape(text.text)
@@ -421,7 +414,7 @@ class PyDocXExporter(object):
         pass
 
     def export_no_break_hyphen(self, hyphen):
-        yield '-'
+        yield "-"
 
     def export_table(self, table):
         return self.yield_nested(table.rows, self.export_node)
@@ -460,7 +453,7 @@ class PyDocXExporter(object):
             return
         self.footnote_tracker.append(footnote_reference)
         footnote_index = len(self.footnote_tracker)
-        yield '{0}'.format(footnote_index)
+        yield "{0}".format(footnote_index)
 
     def export_footnote(self, footnote):
         # TODO a footnote can have paragraph children, should we track

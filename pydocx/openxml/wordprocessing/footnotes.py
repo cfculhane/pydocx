@@ -1,16 +1,9 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-from pydocx.models import XmlModel, XmlCollection
+from pydocx.models import XmlCollection, XmlModel
 from pydocx.openxml.wordprocessing.footnote import Footnote
 
 
 class Footnotes(XmlModel):
-    XML_TAG = 'footnotes'
+    XML_TAG = "footnotes"
 
     children = XmlCollection(Footnote)
 

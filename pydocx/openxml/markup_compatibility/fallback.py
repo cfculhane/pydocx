@@ -1,15 +1,8 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-from pydocx.models import XmlModel, XmlCollection
+from pydocx.models import XmlCollection, XmlModel
 
 
 class Fallback(XmlModel):
-    XML_TAG = 'Fallback'
+    XML_TAG = "Fallback"
 
     # It would be better to refer to the grandparent's children XmlCollection
     # lazily. The problem is that we don't have a good way to represent lazy

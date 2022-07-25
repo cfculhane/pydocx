@@ -1,14 +1,7 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-from pydocx.models import XmlModel, XmlAttribute
+from pydocx.models import XmlAttribute, XmlModel
 
 
 class Bookmark(XmlModel):
-    XML_TAG = 'bookmarkStart'
+    XML_TAG = "bookmarkStart"
 
-    name = XmlAttribute(name='name')
+    name = XmlAttribute(name="name")

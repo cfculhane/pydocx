@@ -1,28 +1,23 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
 from pydocx.openxml.packaging.open_xml_part import OpenXmlPart
 from pydocx.openxml.wordprocessing import Styles
 
 
 class StyleDefinitionsPart(OpenXmlPart):
-    '''
+    """
     Represents style definitions within a Word document container.
 
     See also: http://msdn.microsoft.com/en-us/library/documentformat.openxml.packaging.styledefinitionspart%28v=office.14%29.aspx  # noqa
-    '''
+    """
 
-    relationship_type = '/'.join([
-        'http://schemas.openxmlformats.org',
-        'officeDocument',
-        '2006',
-        'relationships',
-        'styles',
-    ])
+    relationship_type = "/".join(
+        [
+            "http://schemas.openxmlformats.org",
+            "officeDocument",
+            "2006",
+            "relationships",
+            "styles",
+        ]
+    )
 
     def __init__(self, *args, **kwargs):
         super(StyleDefinitionsPart, self).__init__(*args, **kwargs)
@@ -36,7 +31,7 @@ class StyleDefinitionsPart(OpenXmlPart):
         return self._styles
 
     def get_style_chain_stack(self, style_type, style_id):
-        '''
+        """
         Given a style_type and style_id, return the hierarchy of styles ordered
         ascending.
 
@@ -50,7 +45,7 @@ class StyleDefinitionsPart(OpenXmlPart):
         styleA
         styleB
         styleC
-        '''
+        """
         visited_styles = set()
         visited_styles.add(style_id)
 

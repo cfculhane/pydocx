@@ -1,21 +1,16 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
+from pydocx.openxml.packaging.open_xml_part_container import (  # noqa
+    OpenXmlPartContainer,
 )
-
-from pydocx.openxml.packaging.open_xml_part_container import OpenXmlPartContainer  # noqa
 from pydocx.util.xml import parse_xml_from_string
 
 
 class OpenXmlPart(OpenXmlPartContainer):
-    '''
+    """
     An OpenXmlPart is a part associated with either another OpenXmlPart or an
     OpenXmlPackage.
 
     See also: http://msdn.microsoft.com/en-us/library/documentformat.openxml.packaging.openxmlpart%28v=office.14%29.aspx  # noqa
-    '''
+    """
 
     def __init__(
         self,

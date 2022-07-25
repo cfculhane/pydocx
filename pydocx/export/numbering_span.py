@@ -1,10 +1,5 @@
 # coding: utf-8
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import re
 import string
@@ -18,14 +13,16 @@ from pydocx.util.memoize import memoized
 # Defined in 17.15.1.25
 DEFAULT_AUTOMATIC_TAB_STOP_INTERVAL = 720  # twips
 
-roman_numeral_map = tuple(zip(
-    (1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1),
-    ('M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')
-))
+roman_numeral_map = tuple(
+    zip(
+        (1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1),
+        ("M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"),
+    )
+)
 
 
 def int_to_roman(i):
-    '''
+    """
     Given any integer, return the roman numberal string.
 
     >>> int_to_roman(1) == 'I'
@@ -36,17 +33,17 @@ def int_to_roman(i):
     True
     >>> int_to_roman(3789) == 'MMMDCCLXXXIX'
     True
-    '''
+    """
     result = []
     for integer, numeral in roman_numeral_map:
         count = i // integer
         result.append(numeral * count)
         i -= integer * count
-    return ''.join(result)
+    return "".join(result)
 
 
 def roman_to_int(n):
-    '''
+    """
     Given a roman numberal string, return the decimal equivalent.
 
     >>> roman_to_int('I')
@@ -57,17 +54,17 @@ def roman_to_int(n):
     3
     >>> roman_to_int('MMMDCCLXXXIX')
     3789
-    '''
+    """
     i = result = 0
     for integer, numeral in roman_numeral_map:
-        while n[i:i + len(numeral)] == numeral:
+        while n[i : i + len(numeral)] == numeral:
             result += integer
             i += len(numeral)
     return result
 
 
 def alpha_to_int(n):
-    '''
+    """
     Given a ASCII lowercase base-26 string, return the decimal equivalent.
 
     >>> alpha_to_int('a')
@@ -90,7 +87,7 @@ def alpha_to_int(n):
     702
     >>> alpha_to_int('zzz')
     18278
-    '''
+    """
     result = 0
     for index, c in enumerate(reversed(n.lower())):
         ascii_index = string.ascii_lowercase.find(c)
@@ -101,7 +98,7 @@ def alpha_to_int(n):
 
 
 def int_to_alpha(i):
-    '''
+    """
     Given any integer, return the equivalent base-26 ASCII lowercase string.
 
     >>> int_to_alpha(-1) == ''
@@ -120,21 +117,21 @@ def int_to_alpha(i):
     True
     >>> int_to_alpha(18278) == 'zzz'  # (26 * 26 ^ 2) + (26 * 26 ^ 1) + (26 * 26 ^ 0)
     True
-    '''
+    """
     result = []
     base = len(string.ascii_lowercase)
     while i >= 1:
         div, mod = divmod(i - 1, base)
         result.append(string.ascii_lowercase[mod])
         i = div
-    return ''.join(reversed(result))
+    return "".join(reversed(result))
 
 
 class NumberingSpan(object):
-    '''
+    """
     This object contains a list of NumberingItems for which a particular
     NumberingLevel and NumberingDefinition are valid.
-    '''
+    """
 
     def __init__(self, numbering_level, numbering_definition, parent):
         self.children = []
@@ -180,9 +177,9 @@ class NumberingSpan(object):
 
 
 class NumberingItem(object):
-    '''
+    """
     A container for NumberingSpans and any other type of item
-    '''
+    """
 
     def __init__(self, numbering_span):
         self.numbering_span = numbering_span
@@ -208,7 +205,7 @@ class NumberingItem(object):
 
 
 class BaseNumberingSpanBuilder(object):
-    '''
+    """
     De-flatten a list of OOXML components into a list of NumberingSpan + Items
     by calling `get_numbering_spans`
 
@@ -219,7 +216,7 @@ class BaseNumberingSpanBuilder(object):
     of paragraphs + paragraphs with numbering definitions + other misc
     components into nested hierarchical numbering structure. This is
     accomplished using the NumberingSpan and NumberingItem classes.
-    '''
+    """
 
     def __init__(self, components=None, process_components=False):
         if not components:
@@ -246,12 +243,12 @@ class BaseNumberingSpanBuilder(object):
 
     def _get_component_item(self, component, to_tuple=False):
         item = {
-            'num_id': component.numbering_definition.abstract_num_id,
-            'level': component.get_numbering_level().level_id
+            "num_id": component.numbering_definition.abstract_num_id,
+            "level": component.get_numbering_level().level_id,
         }
 
         if to_tuple:
-            item = (item['num_id'], item['level'])
+            item = (item["num_id"], item["level"])
 
         return item
 
@@ -294,11 +291,14 @@ class BaseNumberingSpanBuilder(object):
         child_parent_map = {}
         list_start_stop_index = {}
         # we are interested only in components that are part of the listing
-        components = [component for component in self.components if
-                      hasattr(component, 'properties')
-                      and hasattr(component.properties, 'numbering_properties')
-                      and component.numbering_definition
-                      and component.get_numbering_level()]
+        components = [
+            component
+            for component in self.components
+            if hasattr(component, "properties")
+            and hasattr(component.properties, "numbering_properties")
+            and component.numbering_definition
+            and component.get_numbering_level()
+        ]
         if not components:
             return False
 
@@ -316,34 +316,33 @@ class BaseNumberingSpanBuilder(object):
                 next_item = self._get_component_item(next_component)
                 if parent_item == next_item:
                     outer_item_found = True
-                    if not parent_item['num_id'] in list_start_stop_index:
+                    if not parent_item["num_id"] in list_start_stop_index:
                         # We need to find the index of the component from original
                         # self.components list so that we take into account all additional
                         # paragraphs that a list can contain
-                        list_start_stop_index[parent_item['num_id']] = {
-                            'start': self.components.index(component),
-                            'stop': self.components.index(next_component)
+                        list_start_stop_index[parent_item["num_id"]] = {
+                            "start": self.components.index(component),
+                            "stop": self.components.index(next_component),
                         }
                     break
             if outer_item_found:
-                for _component in components[i + 1:-j - 1]:
+                for _component in components[i + 1 : -j - 1]:
                     child_item = self._get_component_item(_component)
                     # We need to process only items that have different num_id
                     # which mean are part of the different list
-                    if child_item['num_id'] != parent_item['num_id']:
+                    if child_item["num_id"] != parent_item["num_id"]:
                         # Check if child is not already a parent
-                        child_item_children = parent_child_map.get(
-                            (child_item['num_id'], child_item['level']), [])
+                        child_item_children = parent_child_map.get((child_item["num_id"], child_item["level"]), [])
                         if parent_item not in child_item_children:
                             nums.append(child_item)
                 if nums:
                     # parent_key = parent_item['num_id']
-                    parent_key = (parent_item['num_id'], parent_item['level'])
+                    parent_key = (parent_item["num_id"], parent_item["level"])
                     if parent_key not in parent_child_map:
                         parent_child_map[parent_key] = []
 
                     for num in nums:
-                        child_parent_map[num['num_id']] = parent_item
+                        child_parent_map[num["num_id"]] = parent_item
                         if num not in parent_child_map[parent_key]:
                             parent_child_map[parent_key].append(num)
 
@@ -354,9 +353,9 @@ class BaseNumberingSpanBuilder(object):
         return True
 
     def has_parent_list(self, paragraph):
-        '''
+        """
         Check if current paragraph is inside a list which is separated from parent list.
-        '''
+        """
 
         if not paragraph.has_numbering_properties or not paragraph.has_numbering_definition:
             return False
@@ -366,14 +365,14 @@ class BaseNumberingSpanBuilder(object):
 
         num_item = self._get_component_item(paragraph)
 
-        return bool(self.child_parent_num_map.get(num_item['num_id'], None))
+        return bool(self.child_parent_num_map.get(num_item["num_id"], None))
 
     def is_parent_of_current_span(self, paragraph):
-        '''
+        """
 
         :param paragraph:
         :return:
-        '''
+        """
         if not paragraph.has_numbering_properties or not paragraph.has_numbering_definition:
             return False
 
@@ -386,13 +385,13 @@ class BaseNumberingSpanBuilder(object):
         return span_item in self.parent_child_num_map.get(num_item, [])
 
     def include_candidate_items_in_current_item(self, new_item_index):
-        '''
+        """
         A generator to determine which of the candidate numbering items need to
         be added to the current item and which need to be handled some other
         way.
         The list of candidate numbering items is reset when this function
         completes.
-        '''
+        """
         if not self.current_item:
             return
         for index, item in self.candidate_numbering_items:
@@ -404,7 +403,7 @@ class BaseNumberingSpanBuilder(object):
         self.candidate_numbering_items = []
 
     def should_start_new_span(self, index, paragraph):
-        '''
+        """
         If there's not a current span, and the paragraph is a heading
         style, do not start a new span.
         If there's not a current span, and the paragraph is NOT a heading
@@ -413,7 +412,7 @@ class BaseNumberingSpanBuilder(object):
         of the paragraph is different than the numbering definition of the
         span, start a new span.
         Otherwise, do not start a new span.
-        '''
+        """
 
         if self.current_span is None:
             return True
@@ -433,13 +432,13 @@ class BaseNumberingSpanBuilder(object):
             return False
 
         list_idx = self.list_start_stop_index.get(num_def.abstract_num_id)
-        if list_idx and list_idx['start'] == index:
+        if list_idx and list_idx["start"] == index:
             return True
 
         return num_def != self.current_span.numbering_definition
 
     def should_start_new_item(self, index, paragraph):
-        '''
+        """
         If there is not a current span, do not start a new item.
         If the paragraph is a heading style, do not start a new item.
         Start new item if:
@@ -448,7 +447,7 @@ class BaseNumberingSpanBuilder(object):
             Paragraph level id is bigger then 0 which mean we are still inside list
             Numbering definition of the paragraph matches the numbering definition of the
             current span.
-        '''
+        """
 
         if self.current_span is None:
             return False
@@ -466,7 +465,7 @@ class BaseNumberingSpanBuilder(object):
             list_idx = self.list_start_stop_index.get(num_def.abstract_num_id)
             # For mangled lists we need to make sure that we are not handling
             # the first element from the list which have level > 0
-            if list_idx and index > list_idx['start']:
+            if list_idx and index > list_idx["start"]:
                 # We are still in the list
                 if int(level.level_id) > 0:
                     return True
@@ -474,9 +473,9 @@ class BaseNumberingSpanBuilder(object):
         return num_def == self.current_span.numbering_definition
 
     def add_item_to_span(self, index, current_span=None):
-        '''
+        """
         Add a new item to the current span or the span we specify.
-        '''
+        """
 
         self.current_span = current_span or self.current_span
 
@@ -631,7 +630,7 @@ class BaseNumberingSpanBuilder(object):
 
         num_item = self._get_component_item(paragraph)
 
-        parent_num_item = self.child_parent_num_map.get(num_item['num_id'], None)
+        parent_num_item = self.child_parent_num_map.get(num_item["num_id"], None)
         if not parent_num_item:
             return previous_span
 
@@ -692,10 +691,10 @@ class BaseNumberingSpanBuilder(object):
             yield component
 
     def get_numbering_spans(self):
-        '''
+        """
         For each flattened numbering span defined in `self.components`, return
         a new list of items that is de-flattened.
-        '''
+        """
         new_items = []
         index = 0
 
@@ -711,27 +710,27 @@ class BaseNumberingSpanBuilder(object):
 class DefaultFakeNumberingDetector(object):
     def __iter__(self):
         for name in dir(self):
-            if name.startswith('detect_'):
+            if name.startswith("detect_"):
                 func = getattr(self, name)
                 if callable(func):
                     yield func
 
     def detect_paren_digit_paren(self, digit, text):
-        pattern_template = r'^\s*\(\s*{0}\s*\)\s*'
+        pattern_template = r"^\s*\(\s*{0}\s*\)\s*"
         pattern = pattern_template.format(digit)
         matching = re.match(pattern, text)
         if matching:
             return matching.group()
 
     def detect_digit_paren(self, digit, text):
-        pattern_template = r'^\s*{0}\s*\)\s*'
+        pattern_template = r"^\s*{0}\s*\)\s*"
         pattern = pattern_template.format(digit)
         matching = re.match(pattern, text)
         if matching:
             return matching.group()
 
     def detect_digit_dot_space(self, digit, text):
-        pattern_template = r'^\s*{0}\s*\.\s+'
+        pattern_template = r"^\s*{0}\s*\.\s+"
         pattern = pattern_template.format(digit)
         matching = re.match(pattern, text)
         if matching:
@@ -739,10 +738,10 @@ class DefaultFakeNumberingDetector(object):
 
 
 class FakeNumberingDetection(object):
-    '''
+    """
     Detect paragraphs that visually look like numbering spans, and convert them
     into numbering spans.
-    '''
+    """
 
     faked_list_detector_class = DefaultFakeNumberingDetector
 
@@ -752,11 +751,11 @@ class FakeNumberingDetection(object):
         self.faked_list_detectors = self.faked_list_detector_class()
 
         self.faked_list_numbering_format_sequencer = {
-            'decimal': lambda i: int(i),
-            'upperRoman': lambda i: int_to_roman(i).upper(),
-            'lowerRoman': lambda i: int_to_roman(i).lower(),
-            'upperLetter': lambda i: int_to_alpha(i).upper(),
-            'lowerLetter': lambda i: int_to_alpha(i).lower(),
+            "decimal": lambda i: int(i),
+            "upperRoman": lambda i: int_to_roman(i).upper(),
+            "lowerRoman": lambda i: int_to_roman(i).lower(),
+            "upperLetter": lambda i: int_to_alpha(i).upper(),
+            "lowerLetter": lambda i: int_to_alpha(i).lower(),
         }
 
     @memoized
@@ -809,7 +808,7 @@ class FakeNumberingDetection(object):
         return left_position
 
     def get_paragraph_text(self, paragraph):
-        return paragraph.get_text(tab_char=' ')
+        return paragraph.get_text(tab_char=" ")
 
     def detect_new_faked_level_started(self, paragraph, current_level_id=None):
         paragraph_text = self.get_paragraph_text(paragraph)
@@ -830,7 +829,7 @@ class FakeNumberingDetection(object):
                 if matching_text:
                     self.clean_paragraph(paragraph, matching_text)
                     level = wordprocessing.Level(
-                        level_id='{0}'.format(level_id),
+                        level_id="{0}".format(level_id),
                         num_format=num_format,
                     )
                     return level
@@ -936,10 +935,10 @@ class FakeNumberingDetection(object):
         return level
 
     def remove_initial_tab_chars_from_paragraph(self, paragraph):
-        '''
+        """
         Remove initial TabChars from the paragraph, stopping at the first
         non-TabChar node that is encountered.
-        '''
+        """
         for p_child in paragraph.children:
             if isinstance(p_child, Run):
                 for r_child in p_child.children[:]:
@@ -951,7 +950,7 @@ class FakeNumberingDetection(object):
                 return
 
     def remove_initial_text_from_paragraph(self, paragraph, initial_text, tab_char=None):
-        '''
+        """
         Remove the matching `initial_text` starting from the left. Non-Text
         nodes (for example tabs and breaks) are ignored.
 
@@ -979,7 +978,7 @@ class FakeNumberingDetection(object):
                     <t>ef</t>
                 </r>
             </p>
-        '''
+        """
         if not initial_text:
             return
         for run in paragraph.runs:
@@ -991,23 +990,23 @@ class FakeNumberingDetection(object):
                         if len_r_child_text >= len_text:
                             if r_child.text.startswith(initial_text):
                                 r_child.text = r_child.text[len_text:]
-                                initial_text = ''
+                                initial_text = ""
                         else:
                             if initial_text.startswith(r_child.text):
-                                r_child.text = ''
+                                r_child.text = ""
                                 initial_text = initial_text[len_r_child_text:]
                         if not initial_text:
                             return
                 elif tab_char and isinstance(r_child, TabChar):
                     if initial_text.startswith(tab_char):
                         run.children.remove(r_child)
-                        initial_text = initial_text[len(tab_char):]
+                        initial_text = initial_text[len(tab_char) :]
 
     def remove_left_indentation_from_paragraph(self, paragraph):
-        '''
+        """
         Given a paragraph, zero out the left, first_line and handing
         indentation for the paragraph's effective properties.
-        '''
+        """
         properties = paragraph.effective_properties
         if properties:
             properties.indentation_left = 0
@@ -1015,11 +1014,11 @@ class FakeNumberingDetection(object):
             properties.indentation_hanging = 0
 
     def clean_paragraph(self, paragraph, initial_text=None):
-        '''
+        """
         Given a paragraph and initial_text, remove any initial tabs, whitespace
         in addition to the initial_text.
-        '''
-        self.remove_initial_text_from_paragraph(paragraph, initial_text, tab_char=' ')
+        """
+        self.remove_initial_text_from_paragraph(paragraph, initial_text, tab_char=" ")
         self.remove_initial_tab_chars_from_paragraph(paragraph)
         self.remove_left_indentation_from_paragraph(paragraph)
 

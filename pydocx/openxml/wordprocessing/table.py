@@ -1,18 +1,11 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
 from collections import defaultdict
 
-from pydocx.models import XmlModel, XmlCollection
+from pydocx.models import XmlCollection, XmlModel
 from pydocx.openxml.wordprocessing.table_row import TableRow
 
 
 class Table(XmlModel):
-    XML_TAG = 'tbl'
+    XML_TAG = "tbl"
 
     rows = XmlCollection(
         TableRow,
@@ -36,11 +29,11 @@ class Table(XmlModel):
                     # the element being omitted
                     active_rowspan_cells_by_column[column_index] = None
                 elif properties:
-                    vertical_merge = properties.vertical_merge.get('val', 'continue')  # noqa
-                    if vertical_merge == 'restart':
+                    vertical_merge = properties.vertical_merge.get("val", "continue")  # noqa
+                    if vertical_merge == "restart":
                         active_rowspan_cells_by_column[column_index] = cell
                         cell_to_rowspan_count[cell] += 1
-                    elif vertical_merge == 'continue':
+                    elif vertical_merge == "continue":
                         active_rowspan_for_column = active_rowspan_cells_by_column.get(column_index)  # noqa
                         if active_rowspan_for_column:
                             cell_to_rowspan_count[active_rowspan_for_column] += 1  # noqa

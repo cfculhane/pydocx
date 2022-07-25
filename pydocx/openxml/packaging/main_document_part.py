@@ -1,35 +1,32 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
 from pydocx.openxml.packaging.font_table_part import FontTablePart
 from pydocx.openxml.packaging.footnotes_part import FootnotesPart
 from pydocx.openxml.packaging.image_part import ImagePart
-from pydocx.openxml.packaging.numbering_definitions_part import NumberingDefinitionsPart  # noqa
+from pydocx.openxml.packaging.numbering_definitions_part import (  # noqa
+    NumberingDefinitionsPart,
+)
 from pydocx.openxml.packaging.open_xml_part import OpenXmlPart
 from pydocx.openxml.packaging.style_definitions_part import StyleDefinitionsPart  # noqa
 from pydocx.openxml.wordprocessing import Document
 
 
 class MainDocumentPart(OpenXmlPart):
-    '''
+    """
     Represents the actual document XML tree within a Word document container.
     This OpenXmlPart exposes several child parts for styles, numbering, fonts
     and images.
 
     See also: http://msdn.microsoft.com/en-us/library/documentformat.openxml.packaging.maindocumentpart%28v=office.14%29.aspx  # noqa
-    '''
+    """
 
-    relationship_type = '/'.join([
-        'http://schemas.openxmlformats.org',
-        'officeDocument',
-        '2006',
-        'relationships',
-        'officeDocument',
-    ])
+    relationship_type = "/".join(
+        [
+            "http://schemas.openxmlformats.org",
+            "officeDocument",
+            "2006",
+            "relationships",
+            "officeDocument",
+        ]
+    )
 
     child_part_types = [
         FontTablePart,

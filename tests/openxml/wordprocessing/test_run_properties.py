@@ -1,10 +1,3 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
 from unittest import TestCase
 
 from pydocx.openxml.wordprocessing import RunProperties
@@ -17,53 +10,53 @@ class RunPropertiesTestCase(TestCase):
         return RunProperties.load(root)
 
     def test_run_properties_with_symbol_font(self):
-        xml = b'''
+        xml = b"""
             <rPr>
                 <rFonts ascii="Symbol" hAnsi="Symbol"/>
             </rPr>
-        '''
+        """
         properties = self._load_styles_from_xml(xml)
 
         self.assertTrue(properties.r_fonts.is_symbol())
 
     def test_bold_on(self):
-        xml = b'''
+        xml = b"""
             <rPr>
               <b val='on' />
             </rPr>
-        '''
+        """
         properties = self._load_styles_from_xml(xml)
-        self.assertEqual(properties.bold.value, 'on')
+        self.assertEqual(properties.bold.value, "on")
         assert bool(properties.bold)
 
     def test_bold_off(self):
-        xml = b'''
+        xml = b"""
             <rPr>
               <b val='off' />
             </rPr>
-        '''
+        """
         properties = self._load_styles_from_xml(xml)
-        self.assertEqual(properties.bold.value, 'off')
+        self.assertEqual(properties.bold.value, "off")
         assert not bool(properties.bold)
 
     def test_items(self):
-        xml = b'''
+        xml = b"""
             <rPr>
               <b val='off' />
               <i val='on' />
             </rPr>
-        '''
+        """
         properties = self._load_styles_from_xml(xml)
         result = dict(properties.fields)
         self.assertEqual(
             sorted(result.keys()),
-            sorted(['bold', 'italic']),
+            sorted(["bold", "italic"]),
         )
-        assert not bool(result['bold'])
-        assert bool(result['italic'])
+        assert not bool(result["bold"])
+        assert bool(result["italic"])
 
     def test_size_property_returns_None_when_sz_is_None(self):
-        xml = '<rPr />'
+        xml = "<rPr />"
         properties = self._load_styles_from_xml(xml)
         self.assertEqual(properties.size, None)
 
@@ -73,7 +66,7 @@ class RunPropertiesTestCase(TestCase):
         self.assertEqual(properties.size, int(properties.sz))
 
     def test_position_property_returns_0_when_pos_is_None(self):
-        xml = '<rPr />'
+        xml = "<rPr />"
         properties = self._load_styles_from_xml(xml)
         self.assertEqual(properties.position, 0)
 

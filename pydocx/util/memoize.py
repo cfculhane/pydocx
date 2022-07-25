@@ -1,20 +1,13 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
 import collections
 import functools
 
 
 class memoized(object):
-    '''
+    """
     Decorator. Caches a function's return value each time it is called.
     If called later with the same arguments, the cached value is returned
     (not reevaluated).
-    '''
+    """
 
     def __init__(self, func):
         self.func = func
@@ -36,11 +29,11 @@ class memoized(object):
         self.cache[args] = value
 
     def __repr__(self):
-        '''Return the function's docstring.'''
+        """Return the function's docstring."""
         return self.func.__doc__
 
     def __get__(self, obj, objtype):
-        '''Support instance methods.'''
+        """Support instance methods."""
         func = functools.partial(self.__call__, obj)
-        setattr(func, 'memo', self)
+        setattr(func, "memo", self)
         return func

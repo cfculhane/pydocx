@@ -1,10 +1,3 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
 from unittest import TestCase
 
 from pydocx.openxml.wordprocessing import Paragraph
@@ -19,27 +12,27 @@ class ParagraphTestBase(TestCase):
 
 class GetTextTestCase(ParagraphTestBase):
     def test_no_runs(self):
-        xml = '<p/>'
+        xml = "<p/>"
         paragraph = self._load_from_xml(xml)
-        self.assertEqual(paragraph.get_text(), '')
+        self.assertEqual(paragraph.get_text(), "")
 
     def test_no_text_nodes_several_runs(self):
-        xml = '<p><r /><r /></p>'
+        xml = "<p><r /><r /></p>"
         paragraph = self._load_from_xml(xml)
-        self.assertEqual(paragraph.get_text(), '')
+        self.assertEqual(paragraph.get_text(), "")
 
     def test_only_non_text_children_in_run(self):
-        xml = '<p><r><br /></r></p>'
+        xml = "<p><r><br /></r></p>"
         paragraph = self._load_from_xml(xml)
-        self.assertEqual(paragraph.get_text(), '')
+        self.assertEqual(paragraph.get_text(), "")
 
     def test_single_run_single_text_node(self):
-        xml = '<p><r><t>foo</t></r></p>'
+        xml = "<p><r><t>foo</t></r></p>"
         paragraph = self._load_from_xml(xml)
-        self.assertEqual(paragraph.get_text(), 'foo')
+        self.assertEqual(paragraph.get_text(), "foo")
 
     def test_single_run_many_text_nodes(self):
-        xml = '''
+        xml = """
             <p>
                 <r>
                     <t>a</t>
@@ -47,12 +40,12 @@ class GetTextTestCase(ParagraphTestBase):
                     <t>c</t>
                 </r>
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
-        self.assertEqual(paragraph.get_text(), 'abc')
+        self.assertEqual(paragraph.get_text(), "abc")
 
     def test_many_runs_many_text_nodes(self):
-        xml = '''
+        xml = """
             <p>
                 <r>
                     <t>a</t>
@@ -67,12 +60,12 @@ class GetTextTestCase(ParagraphTestBase):
                     <t>f</t>
                 </r>
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
-        self.assertEqual(paragraph.get_text(), 'abcdef')
+        self.assertEqual(paragraph.get_text(), "abcdef")
 
     def test_single_run_many_text_nodes_with_non_text_nodes(self):
-        xml = '''
+        xml = """
             <p>
                 <r>
                     <t>a</t>
@@ -83,12 +76,12 @@ class GetTextTestCase(ParagraphTestBase):
                     <noBreakHyphen />
                 </r>
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
-        self.assertEqual(paragraph.get_text(), 'abc')
+        self.assertEqual(paragraph.get_text(), "abc")
 
     def test_single_run_many_text_nodes_with_spacing(self):
-        xml = '''
+        xml = """
             <p>
                 <r>
                     <t> a </t>
@@ -96,12 +89,12 @@ class GetTextTestCase(ParagraphTestBase):
                     <t> c </t>
                 </r>
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
-        self.assertEqual(paragraph.get_text(), ' a  b  c ')
+        self.assertEqual(paragraph.get_text(), " a  b  c ")
 
     def test_with_tab_char_set(self):
-        xml = '''
+        xml = """
             <p>
                 <r>
                     <t>a</t>
@@ -109,50 +102,50 @@ class GetTextTestCase(ParagraphTestBase):
                     <t>b</t>
                 </r>
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
-        self.assertEqual(paragraph.get_text(tab_char=' '), 'a b')
+        self.assertEqual(paragraph.get_text(tab_char=" "), "a b")
 
 
 class GetNumberOfInitialTabsTestCase(ParagraphTestBase):
     def test_empty_paragraph(self):
-        xml = '<p />'
+        xml = "<p />"
         paragraph = self._load_from_xml(xml)
         self.assertEqual(paragraph.get_number_of_initial_tabs(), 0)
 
     def test_empty_run(self):
-        xml = '''
+        xml = """
             <p>
                 <r />
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
         self.assertEqual(paragraph.get_number_of_initial_tabs(), 0)
 
     def test_single_run_single_text_node(self):
-        xml = '''
+        xml = """
             <p>
                 <r>
                     <t>Foo</t>
                 </r>
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
         self.assertEqual(paragraph.get_number_of_initial_tabs(), 0)
 
     def test_single_initial_tab(self):
-        xml = '''
+        xml = """
             <p>
                 <r>
                     <tab />
                 </r>
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
         self.assertEqual(paragraph.get_number_of_initial_tabs(), 1)
 
     def test_many_runs_many_tabs(self):
-        xml = '''
+        xml = """
             <p>
                 <r>
                     <tab />
@@ -167,12 +160,12 @@ class GetNumberOfInitialTabsTestCase(ParagraphTestBase):
                     <tab />
                 </r>
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
         self.assertEqual(paragraph.get_number_of_initial_tabs(), 5)
 
     def test_break_tag_stops_counting(self):
-        xml = '''
+        xml = """
             <p>
                 <r>
                     <tab />
@@ -183,12 +176,12 @@ class GetNumberOfInitialTabsTestCase(ParagraphTestBase):
                     <tab />
                 </r>
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
         self.assertEqual(paragraph.get_number_of_initial_tabs(), 2)
 
     def test_text_node_stops_counting(self):
-        xml = '''
+        xml = """
             <p>
                 <r>
                     <tab />
@@ -199,12 +192,12 @@ class GetNumberOfInitialTabsTestCase(ParagraphTestBase):
                     <tab />
                 </r>
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
         self.assertEqual(paragraph.get_number_of_initial_tabs(), 2)
 
     def test_hyperlink_stops_counting(self):
-        xml = '''
+        xml = """
             <p>
                 <r>
                     <tab />
@@ -214,6 +207,6 @@ class GetNumberOfInitialTabsTestCase(ParagraphTestBase):
                     <tab />
                 </r>
             </p>
-        '''
+        """
         paragraph = self._load_from_xml(xml)
         self.assertEqual(paragraph.get_number_of_initial_tabs(), 1)

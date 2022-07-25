@@ -1,20 +1,16 @@
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
+from __future__ import absolute_import, print_function, unicode_literals
 
 import posixpath
 from collections import defaultdict
 
 
 class OpenXmlPartContainer(object):
-    '''
+    """
     Represents a container for other OpenXmlParts that are associated with a
     OpenXmlPackage.
 
     See also: http://msdn.microsoft.com/en-us/library/documentformat.openxml.packaging.openxmlpartcontainer%28v=office.14%29.aspx  # noqa
-    '''
+    """
 
     child_part_types = []
 

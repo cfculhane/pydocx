@@ -1,19 +1,15 @@
 # coding: utf-8
 
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
+from __future__ import absolute_import, print_function, unicode_literals
 
+from pydocx.openxml.packaging import MainDocumentPart
 from pydocx.test import DocumentGeneratorTestCase
 from pydocx.test.utils import WordprocessingDocumentFactory
-from pydocx.openxml.packaging import MainDocumentPart
 
 
 class TableTestCase(DocumentGeneratorTestCase):
     def test_textbox_with_content(self):
-        document_xml = '''
+        document_xml = """
             <p>
                 <r>
                     <AlternateContent>
@@ -35,22 +31,22 @@ class TableTestCase(DocumentGeneratorTestCase):
                     </AlternateContent>
                 </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '''
+        expected_html = """
             <p>
                 <p>
                     AAA
                 </p>
             </p>
-        '''
+        """
         self.assert_document_generates_html(document, expected_html)
 
     def test_textbox_with_content_outside_of_textbox(self):
-        document_xml = '''
+        document_xml = """
             <p>
                 <r><t>AAA</t></r>
                 <r>
@@ -76,12 +72,12 @@ class TableTestCase(DocumentGeneratorTestCase):
                 </r>
                 <r><t>EEE</t></r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '''
+        expected_html = """
             <p>
                 AAABBB
                 <p>
@@ -89,11 +85,11 @@ class TableTestCase(DocumentGeneratorTestCase):
                 </p>
                 DDDEEE
             </p>
-        '''
+        """
         self.assert_document_generates_html(document, expected_html)
 
     def test_fallback_is_only_text(self):
-        document_xml = '''
+        document_xml = """
             <p>
                 <r><t>AAA</t></r>
                 <r>
@@ -107,18 +103,18 @@ class TableTestCase(DocumentGeneratorTestCase):
                 </r>
                 <r><t>EEE</t></r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '''
+        expected_html = """
             <p>AAABBBCCCDDDEEE</p>
-        '''
+        """
         self.assert_document_generates_html(document, expected_html)
 
     def test_fallback_contains_a_table(self):
-        document_xml = '''
+        document_xml = """
             <p>
                 <r><t>AAA</t></r>
                 <r>
@@ -146,12 +142,12 @@ class TableTestCase(DocumentGeneratorTestCase):
                 </r>
                 <r><t>EEE</t></r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '''
+        expected_html = """
             <p>AAABBB</p>
             <table border="1">
                 <tr>
@@ -159,7 +155,7 @@ class TableTestCase(DocumentGeneratorTestCase):
                 </tr>
             </table>
             <p>DDDEEE</p>
-        '''
+        """
         self.assert_document_generates_html(document, expected_html)
 
     def test_fallback_has_invalid_children(self):
@@ -171,7 +167,7 @@ class TableTestCase(DocumentGeneratorTestCase):
         # This test is showing an invalid child for Fallback. When #215 gets
         # fixed, this test should fail. When it does, you'll want to strip out
         # the table from the expected_html.
-        document_xml = '''
+        document_xml = """
             <p>
                 <r><t>AAA</t></r>
                 <r>
@@ -195,12 +191,12 @@ class TableTestCase(DocumentGeneratorTestCase):
                 </r>
                 <r><t>EEE</t></r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '''
+        expected_html = """
             <p>AAABBB
                 <table border="1">
                     <tr>
@@ -208,11 +204,11 @@ class TableTestCase(DocumentGeneratorTestCase):
                     </tr>
                 </table>
             DDDEEE</p>
-        '''
+        """
         self.assert_document_generates_html(document, expected_html)
 
     def test_fallback_is_in_root(self):
-        document_xml = '''
+        document_xml = """
         <AlternateContent>
             <Fallback>
                 <p>
@@ -222,18 +218,18 @@ class TableTestCase(DocumentGeneratorTestCase):
                 </p>
             </Fallback>
         </AlternateContent>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '''
+        expected_html = """
             <p>AAA</p>
-        '''
+        """
         self.assert_document_generates_html(document, expected_html)
 
     def test_choice_is_ignored(self):
-        document_xml = '''
+        document_xml = """
         <AlternateContent>
             <Choice>
                 <p>
@@ -250,12 +246,12 @@ class TableTestCase(DocumentGeneratorTestCase):
                 </p>
             </Fallback>
         </AlternateContent>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '''
+        expected_html = """
             <p>AAA</p>
-        '''
+        """
         self.assert_document_generates_html(document, expected_html)

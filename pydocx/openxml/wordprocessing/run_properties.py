@@ -1,32 +1,25 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-from pydocx.models import XmlModel, XmlChild
-from pydocx.types import OnOff, Underline
+from pydocx.models import XmlChild, XmlModel
 from pydocx.openxml.wordprocessing.rfonts import RFonts
+from pydocx.types import OnOff, Underline
 
 
 class RunProperties(XmlModel):
-    XML_TAG = 'rPr'
+    XML_TAG = "rPr"
 
-    bold = XmlChild(type=OnOff, name='b', attrname='val')
-    italic = XmlChild(type=OnOff, name='i', attrname='val')
-    underline = XmlChild(type=Underline, name='u', attrname='val')
-    caps = XmlChild(type=OnOff, attrname='val')
-    small_caps = XmlChild(type=OnOff, name='smallCaps', attrname='val')
-    strike = XmlChild(type=OnOff, attrname='val')
-    dstrike = XmlChild(type=OnOff, attrname='val')
-    vanish = XmlChild(type=OnOff, attrname='val')
-    hidden = XmlChild(type=OnOff, name='webHidden', attrname='val')
-    vertical_align = XmlChild(name='vertAlign', attrname='val')
-    parent_style = XmlChild(name='rStyle', attrname='val')
-    pos = XmlChild(name='position', attrname='val')
-    sz = XmlChild(name='sz', attrname='val')
-    clr = XmlChild(name='color', attrname='val')
+    bold = XmlChild(type=OnOff, name="b", attrname="val")
+    italic = XmlChild(type=OnOff, name="i", attrname="val")
+    underline = XmlChild(type=Underline, name="u", attrname="val")
+    caps = XmlChild(type=OnOff, attrname="val")
+    small_caps = XmlChild(type=OnOff, name="smallCaps", attrname="val")
+    strike = XmlChild(type=OnOff, attrname="val")
+    dstrike = XmlChild(type=OnOff, attrname="val")
+    vanish = XmlChild(type=OnOff, attrname="val")
+    hidden = XmlChild(type=OnOff, name="webHidden", attrname="val")
+    vertical_align = XmlChild(name="vertAlign", attrname="val")
+    parent_style = XmlChild(name="rStyle", attrname="val")
+    pos = XmlChild(name="position", attrname="val")
+    sz = XmlChild(name="sz", attrname="val")
+    clr = XmlChild(name="color", attrname="val")
     r_fonts = XmlChild(type=RFonts)
 
     @property
@@ -34,7 +27,7 @@ class RunProperties(XmlModel):
         if self.clr is None:
             return
         # TODO: When we support background colors, remove FFFFFF check
-        if self.clr == '000000' or self.clr == 'FFFFFF':
+        if self.clr == "000000" or self.clr == "FFFFFF":
             return
 
         return self.clr
@@ -56,7 +49,7 @@ class RunProperties(XmlModel):
         return size
 
     def is_superscript(self):
-        return self.vertical_align == 'superscript'
+        return self.vertical_align == "superscript"
 
     def is_subscript(self):
-        return self.vertical_align == 'subscript'
+        return self.vertical_align == "subscript"

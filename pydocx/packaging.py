@@ -1,8 +1,4 @@
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
+from __future__ import absolute_import, print_function, unicode_literals
 
 import posixpath
 import zipfile
@@ -10,36 +6,34 @@ from collections import defaultdict
 from io import BytesIO
 
 from pydocx.exceptions import MalformedDocxException
-from pydocx.util.xml import (
-    parse_xml_from_string,
-    xml_tag_split,
-    XmlNamespaceManager,
-)
+from pydocx.util.xml import XmlNamespaceManager, parse_xml_from_string, xml_tag_split
 
 
 class PackageRelationship(object):
-    '''
+    """
     Represents an association between a source Package or PackagePart, and a
     target object which can be a PackagePart or external resource.
 
     See also: http://msdn.microsoft.com/en-us/library/system.io.packaging.packagerelationship.aspx  # noqa
-    '''
+    """
 
-    namespace = '/'.join([
-        'http://schemas.openxmlformats.org',
-        'package',
-        '2006',
-        'relationships',
-    ])
+    namespace = "/".join(
+        [
+            "http://schemas.openxmlformats.org",
+            "package",
+            "2006",
+            "relationships",
+        ]
+    )
 
-    TARGET_MODE_INTERNAL = 'Internal'
-    TARGET_MODE_EXTERNAL = 'External'
+    TARGET_MODE_INTERNAL = "Internal"
+    TARGET_MODE_EXTERNAL = "External"
 
-    XML_TAG_NAME = 'Relationship'
-    XML_ATTR_ID = 'Id'
-    XML_ATTR_TARGETMODE = 'TargetMode'
-    XML_ATTR_TARGET = 'Target'
-    XML_ATTR_TYPE = 'Type'
+    XML_TAG_NAME = "Relationship"
+    XML_ATTR_ID = "Id"
+    XML_ATTR_TARGETMODE = "TargetMode"
+    XML_ATTR_TARGET = "Target"
+    XML_ATTR_TYPE = "Type"
 
     def __init__(
         self,
@@ -64,10 +58,10 @@ class PackageRelationship(object):
 
 
 class PackageRelationshipManager(object):
-    '''
+    """
     An internal class used by ZipPackage and ZipPackagePart to abstract the
     package and part-level relationship management.
-    '''
+    """
 
     def __init__(self):
         super(PackageRelationshipManager, self).__init__()
@@ -138,11 +132,11 @@ class PackageRelationshipManager(object):
 
 
 class ZipPackagePart(PackageRelationshipManager):
-    '''
+    """
     Represents a data part within a ZipPackage.
 
     See also: http://msdn.microsoft.com/en-us/library/system.io.packaging.zippackagepart.aspx  # noqa
-    '''
+    """
 
     def __init__(self, uri, package):
         super(ZipPackagePart, self).__init__()
@@ -155,8 +149,8 @@ class ZipPackagePart(PackageRelationshipManager):
     @staticmethod
     def get_relationship_part_uri(part_uri):
         container, filename = posixpath.split(part_uri)
-        filename_rels = '{file}.rels'.format(file=filename)
-        return posixpath.join(container, '_rels', filename_rels)
+        filename_rels = "{file}.rels".format(file=filename)
+        return posixpath.join(container, "_rels", filename_rels)
 
     def get_part_container(self):
         return self.package
@@ -167,18 +161,18 @@ class ZipPackagePart(PackageRelationshipManager):
 
 
 class ZipPackage(PackageRelationshipManager):
-    '''
+    """
     Represents a container that can that can store multiple data objects using
     a ZIP archive as a data store.
 
     See also: http://msdn.microsoft.com/en-us/library/system.io.packaging.zippackage.aspx  # noqa
-    '''
+    """
 
     def __init__(self, path):
         super(ZipPackage, self).__init__()
         self.path = path
         self.streams = {}
-        self.uri = '/'
+        self.uri = "/"
         self._parts = None
         self.relationship_uri = ZipPackagePart.get_relationship_part_uri(
             self.uri,

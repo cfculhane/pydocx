@@ -1,19 +1,12 @@
 # coding: utf-8
 
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
+from __future__ import absolute_import, print_function, unicode_literals
 
 from pydocx.export.html import PyDocXHTMLExporter
 from pydocx.export.mixins import FakedSuperscriptAndSubscriptExportMixin
 from pydocx.openxml.packaging import MainDocumentPart, StyleDefinitionsPart
 from pydocx.test import DocumentGeneratorTestCase, DocXFixtureTestCaseFactory
-from pydocx.test.utils import (
-    PyDocXHTMLExporterNoStyle,
-    WordprocessingDocumentFactory,
-)
+from pydocx.test.utils import PyDocXHTMLExporterNoStyle, WordprocessingDocumentFactory
 
 
 class FakedSuperscriptAndSubscriptHTMLExporterNoStyle(
@@ -35,17 +28,17 @@ class FakedSuperscriptAndSubscriptTestCase(DocumentGeneratorTestCase):
 
 
 class FakedSubScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
-    style_xml = '''
+    style_xml = """
         <style styleId="faked_subscript" type="paragraph">
           <name val="Normal"/>
           <rPr>
             <sz val="24"/>
           </rPr>
         </style>
-    '''
+    """
 
     def test_sub_detected_pStyle_has_smaller_size_and_negative_position(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <pPr>
                 <pStyle val="faked_subscript"/>
@@ -64,17 +57,17 @@ class FakedSubScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
                 <t>O</t>
               </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(StyleDefinitionsPart, self.style_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>H<sub>2</sub>O</p>'
+        expected_html = "<p>H<sub>2</sub>O</p>"
         self.assert_document_generates_html(document, expected_html)
 
     def test_no_sub_detected_because_local_size_larger_than_pStyle_size(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <pPr>
                 <pStyle val="faked_subscript"/>
@@ -93,17 +86,17 @@ class FakedSubScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
                 <t>O</t>
               </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(StyleDefinitionsPart, self.style_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>H2O</p>'
+        expected_html = "<p>H2O</p>"
         self.assert_document_generates_html(document, expected_html)
 
     def test_no_sub_because_position_is_zero(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <pPr>
                 <pStyle val="faked_subscript"/>
@@ -122,17 +115,17 @@ class FakedSubScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
                 <t>O</t>
               </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(StyleDefinitionsPart, self.style_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>H2O</p>'
+        expected_html = "<p>H2O</p>"
         self.assert_document_generates_html(document, expected_html)
 
     def test_no_sub_because_position_is_not_set(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <pPr>
                 <pStyle val="faked_subscript"/>
@@ -150,18 +143,18 @@ class FakedSubScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
                 <t>O</t>
               </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(StyleDefinitionsPart, self.style_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>H2O</p>'
+        expected_html = "<p>H2O</p>"
         self.assert_document_generates_html(document, expected_html)
 
     def test_no_sub_detected_for_size_set_in_rPrChange(self):
         # Test for issue #116
-        document_xml = '''
+        document_xml = """
             <p>
               <pPr>
                 <pStyle val="faked_subscript"/>
@@ -182,28 +175,28 @@ class FakedSubScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
                 <t>O</t>
               </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(StyleDefinitionsPart, self.style_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>H2O</p>'
+        expected_html = "<p>H2O</p>"
         self.assert_document_generates_html(document, expected_html)
 
 
 class FakedSuperScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
-    style_xml = '''
+    style_xml = """
         <style styleId="faked_superscript" type="paragraph">
           <name val="Normal"/>
           <rPr>
             <sz val="24"/>
           </rPr>
         </style>
-    '''
+    """
 
     def test_sup_detected_pStyle_has_larger_size_and_positive_position(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <pPr>
                 <pStyle val="faked_superscript"/>
@@ -219,17 +212,17 @@ class FakedSuperScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
                 <t>th</t>
               </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(StyleDefinitionsPart, self.style_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>n<sup>th</sup></p>'
+        expected_html = "<p>n<sup>th</sup></p>"
         self.assert_document_generates_html(document, expected_html)
 
     def test_no_sup_detected_because_local_size_larger_than_pStyle_size(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <pPr>
                 <pStyle val="faked_superscript"/>
@@ -245,17 +238,17 @@ class FakedSuperScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
                 <t>th</t>
               </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(StyleDefinitionsPart, self.style_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>nth</p>'
+        expected_html = "<p>nth</p>"
         self.assert_document_generates_html(document, expected_html)
 
     def test_no_sup_because_position_is_zero(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <pPr>
                 <pStyle val="faked_superscript"/>
@@ -271,17 +264,17 @@ class FakedSuperScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
                 <t>th</t>
               </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(StyleDefinitionsPart, self.style_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>nth</p>'
+        expected_html = "<p>nth</p>"
         self.assert_document_generates_html(document, expected_html)
 
     def test_no_sup_because_position_is_not_set(self):
-        document_xml = '''
+        document_xml = """
             <p>
               <pPr>
                 <pStyle val="faked_superscript"/>
@@ -296,18 +289,18 @@ class FakedSuperScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
                 <t>th</t>
               </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(StyleDefinitionsPart, self.style_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>nth</p>'
+        expected_html = "<p>nth</p>"
         self.assert_document_generates_html(document, expected_html)
 
     def test_no_sup_detected_for_size_set_in_rPrChange(self):
         # Test for issue #116
-        document_xml = '''
+        document_xml = """
             <p>
               <pPr>
                 <pStyle val="faked_superscript"/>
@@ -325,21 +318,21 @@ class FakedSuperScriptTestCase(FakedSuperscriptAndSubscriptTestCase):
                 <t>th</t>
               </r>
             </p>
-        '''
+        """
 
         document = WordprocessingDocumentFactory()
         document.add(StyleDefinitionsPart, self.style_xml)
         document.add(MainDocumentPart, document_xml)
 
-        expected_html = '<p>nth</p>'
+        expected_html = "<p>nth</p>"
         self.assert_document_generates_html(document, expected_html)
 
 
 class DocXFixtureTestCase(DocXFixtureTestCaseFactory):
     exporter = FakedSuperscriptAndSubscriptHTMLExporter
     cases = (
-        'fake_subscript',
-        'fake_superscript',
+        "fake_subscript",
+        "fake_superscript",
     )
 
 

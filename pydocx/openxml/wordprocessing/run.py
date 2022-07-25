@@ -1,31 +1,23 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-
-from pydocx.models import XmlModel, XmlCollection, XmlChild
-from pydocx.openxml.wordprocessing.run_properties import RunProperties
+from pydocx.models import XmlChild, XmlCollection, XmlModel
+from pydocx.openxml.markup_compatibility import AlternateContent
 from pydocx.openxml.wordprocessing.br import Break
+from pydocx.openxml.wordprocessing.deleted_text import DeletedText
 from pydocx.openxml.wordprocessing.drawing import Drawing
+from pydocx.openxml.wordprocessing.embedded_object import EmbeddedObject
 from pydocx.openxml.wordprocessing.field_char import FieldChar
 from pydocx.openxml.wordprocessing.field_code import FieldCode
-from pydocx.openxml.wordprocessing.picture import Picture
-from pydocx.openxml.wordprocessing.no_break_hyphen import NoBreakHyphen
-from pydocx.openxml.wordprocessing.text import Text
-from pydocx.openxml.wordprocessing.tab_char import TabChar
-from pydocx.openxml.wordprocessing.deleted_text import DeletedText
 from pydocx.openxml.wordprocessing.footnote_reference import FootnoteReference
 from pydocx.openxml.wordprocessing.footnote_reference_mark import FootnoteReferenceMark
-from pydocx.openxml.wordprocessing.embedded_object import EmbeddedObject
-from pydocx.openxml.markup_compatibility import AlternateContent
+from pydocx.openxml.wordprocessing.no_break_hyphen import NoBreakHyphen
+from pydocx.openxml.wordprocessing.picture import Picture
+from pydocx.openxml.wordprocessing.run_properties import RunProperties
+from pydocx.openxml.wordprocessing.tab_char import TabChar
+from pydocx.openxml.wordprocessing.text import Text
 from pydocx.util.memoize import memoized
 
 
 class Run(XmlModel):
-    XML_TAG = 'r'
+    XML_TAG = "r"
 
     properties = XmlChild(type=RunProperties)
 
@@ -56,9 +48,9 @@ class Run(XmlModel):
         # TODO the getattr is necessary because of footnotes. From the context
         # of a footnote, a paragraph's container is the footnote part, which
         # doesn't have access to the style_definitions_part
-        part = getattr(self.container, 'style_definitions_part', None)
+        part = getattr(self.container, "style_definitions_part", None)
         if part:
-            style_stack = part.get_style_chain_stack('character', parent_style)
+            style_stack = part.get_style_chain_stack("character", parent_style)
             for result in style_stack:
                 yield result
 
@@ -88,7 +80,7 @@ class Run(XmlModel):
         return inherited_properties
 
     @property
-    def inherited_properties(self):
+    def inherited_properties(self) -> RunProperties:
         properties = {}
         properties.update(
             self._get_properties_inherited_from_parent_paragraph(),
@@ -100,7 +92,7 @@ class Run(XmlModel):
 
     @property
     @memoized
-    def effective_properties(self):
+    def effective_properties(self) -> RunProperties:
         inherited_properties = self.inherited_properties
         effective_properties = {}
         effective_properties.update(dict(inherited_properties.fields))

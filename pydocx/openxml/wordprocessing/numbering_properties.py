@@ -1,20 +1,13 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-from pydocx.models import XmlModel, XmlChild
+from pydocx.models import XmlChild, XmlModel
 
 
 class NumberingProperties(XmlModel):
-    XML_TAG = 'numPr'
+    XML_TAG = "numPr"
 
-    ROOT_LEVEL_ID = '0'
+    ROOT_LEVEL_ID = "0"
 
-    level_id = XmlChild(name='ilvl', attrname='val')
-    num_id = XmlChild(name='numId', attrname='val')
+    level_id = XmlChild(name="ilvl", attrname="val")
+    num_id = XmlChild(name="numId", attrname="val")
 
     def is_root_level(self):
         if self.num_id is None or self.level_id is None:

@@ -1,8 +1,4 @@
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
+from __future__ import absolute_import, print_function, unicode_literals
 
 import os
 from contextlib import contextmanager
@@ -14,46 +10,46 @@ from pydocx.export.html import PyDocXHTMLExporter
 from pydocx.openxml.packaging import MainDocumentPart
 from pydocx.test.utils import (
     PyDocXHTMLExporterNoStyle,
-    XMLDocx2Html,
     WordprocessingDocumentFactory,
+    XMLDocx2Html,
     assert_html_equal,
     html_is_equal,
     prettify,
 )
 from pydocx.util.zip import create_zip_archive
 
-
 STYLE = (
-    '<style>'
-    '.pydocx-caps {text-transform:uppercase}'
-    '.pydocx-center {text-align:center}'
-    '.pydocx-comment {color:blue}'
-    '.pydocx-delete {color:red;text-decoration:line-through}'
-    '.pydocx-hidden {visibility:hidden}'
-    '.pydocx-insert {color:green}'
-    '.pydocx-left {text-align:left}'
-    '.pydocx-list-style-type-cardinalText {list-style-type:decimal}'
-    '.pydocx-list-style-type-decimal {list-style-type:decimal}'
-    '.pydocx-list-style-type-decimalEnclosedCircle {list-style-type:decimal}'
-    '.pydocx-list-style-type-decimalEnclosedFullstop {list-style-type:decimal}'
-    '.pydocx-list-style-type-decimalEnclosedParen {list-style-type:decimal}'
-    '.pydocx-list-style-type-decimalZero {list-style-type:decimal-leading-zero}'  # noqa
-    '.pydocx-list-style-type-lowerLetter {list-style-type:lower-alpha}'
-    '.pydocx-list-style-type-lowerRoman {list-style-type:lower-roman}'
-    '.pydocx-list-style-type-none {list-style-type:none}'
-    '.pydocx-list-style-type-ordinalText {list-style-type:decimal}'
-    '.pydocx-list-style-type-upperLetter {list-style-type:upper-alpha}'
-    '.pydocx-list-style-type-upperRoman {list-style-type:upper-roman}'
-    '.pydocx-right {text-align:right}'
-    '.pydocx-small-caps {font-variant:small-caps}'
-    '.pydocx-strike {text-decoration:line-through}'
-    '.pydocx-tab {display:inline-block;width:4em}'
-    '.pydocx-underline {text-decoration:underline}'
-    'body {margin:0px auto;width:51.00em}'
-    '</style>'
+    "<style>"
+    ".pydocx-caps {text-transform:uppercase}"
+    ".pydocx-center {text-align:center}"
+    ".pydocx-comment {color:blue}"
+    ".pydocx-delete {color:red;text-decoration:line-through}"
+    ".pydocx-hidden {visibility:hidden}"
+    ".pydocx-insert {color:green}"
+    ".pydocx-left {text-align:left}"
+    ".pydocx-list-style-type-cardinalText {list-style-type:decimal}"
+    ".pydocx-list-style-type-decimal {list-style-type:decimal}"
+    ".pydocx-list-style-type-decimalEnclosedCircle {list-style-type:decimal}"
+    ".pydocx-list-style-type-decimalEnclosedFullstop {list-style-type:decimal}"
+    ".pydocx-list-style-type-decimalEnclosedParen {list-style-type:decimal}"
+    ".pydocx-list-style-type-decimalZero {list-style-type:decimal-leading-zero}"  # noqa
+    ".pydocx-list-style-type-lowerLetter {list-style-type:lower-alpha}"
+    ".pydocx-list-style-type-lowerRoman {list-style-type:lower-roman}"
+    ".pydocx-list-style-type-none {list-style-type:none}"
+    ".pydocx-list-style-type-ordinalText {list-style-type:decimal}"
+    ".pydocx-list-style-type-upperLetter {list-style-type:upper-alpha}"
+    ".pydocx-list-style-type-upperRoman {list-style-type:upper-roman}"
+    ".pydocx-right {text-align:right}"
+    ".pydocx-small-caps {font-variant:small-caps}"
+    ".pydocx-strike {text-decoration:line-through}"
+    ".pydocx-tab {display:inline-block;width:4em}"
+    ".pydocx-underline {text-decoration:underline}"
+    "body {margin:0px auto;width:51.00em}"
+    "</style>"
 )
 
-BASE_HTML = '''
+BASE_HTML = (
+    """
 <html>
     <head>
     <meta charset="utf-8" />
@@ -61,30 +57,32 @@ BASE_HTML = '''
     </head>
     <body>%%s</body>
 </html>
-''' % STYLE
+"""
+    % STYLE
+)
 
 
-BASE_HTML_NO_STYLE = '''
+BASE_HTML_NO_STYLE = """
 <html>
     <head><meta charset="utf-8" /></head>
     <body>%s</body>
 </html>
-'''
+"""
 
 DEFAULT_NUMBERING_DICT = {
-    '1': {
-        '0': 'decimal',
-        '1': 'decimal',
+    "1": {
+        "0": "decimal",
+        "1": "decimal",
     },
-    '2': {
-        '0': 'lowerLetter',
-        '1': 'lowerLetter',
+    "2": {
+        "0": "lowerLetter",
+        "1": "lowerLetter",
     },
 }
 
 
 class DocumentGeneratorTestCase(TestCase):
-    '''
+    """
     A test case class that can be inherited to compare xml fragments with their
     resulting HTML output.
 
@@ -102,7 +100,7 @@ class DocumentGeneratorTestCase(TestCase):
 
     could be used as a way to include a non-standard video part with arbitrary
     data.
-    '''
+    """
 
     exporter = PyDocXHTMLExporterNoStyle
 
@@ -126,18 +124,18 @@ class DocumentGeneratorTestCase(TestCase):
             except ExpatError:
                 pass
             message = [
-                'The expected HTML did not match the actual HTML:',
+                "The expected HTML did not match the actual HTML:",
                 actual,
             ]
             if save_zip_on_failure:
-                _, path_to_docx = mkstemp(suffix='.docx', prefix='pydocx-')
-                with open(path_to_docx, 'w') as f:
+                _, path_to_docx = mkstemp(suffix=".docx", prefix="pydocx-")
+                with open(path_to_docx, "w") as f:
                     zip_archive.seek(0)
                     f.write(zip_archive.read())
                 message.append(
-                    'The docx was saved to {path}'.format(path=path_to_docx),
+                    "The docx was saved to {path}".format(path=path_to_docx),
                 )
-            raise AssertionError('\n'.join(message))
+            raise AssertionError("\n".join(message))
 
     def get_zip_archive_for_document(self, document, additional_parts=None):
         doc_zip_dict = document.to_zip_dict()
@@ -174,7 +172,7 @@ class TranslationTestCase(TestCase):
 
     def assert_expected_output(self):
         if self.expected_output is None:
-            raise NotImplementedError('expected_output is not defined')
+            raise NotImplementedError("expected_output is not defined")
         if not self.run_expected_output:
             return
 
@@ -214,20 +212,20 @@ class TranslationTestCase(TestCase):
 class DocXFixtureTestCaseFactory(TestCase):
     cases_path = os.path.join(
         os.path.abspath(os.path.dirname(__file__)),
-        '..',
-        '..',
-        'tests',
-        'fixtures',
+        "..",
+        "..",
+        "tests",
+        "fixtures",
     )
     exporter = PyDocXHTMLExporter
 
     @classmethod
     def create(cls, name):
         def run_test(self):
-            docx_path = self.get_path_to_fixture('%s.docx' % name)
-            expected_path = self.get_path_to_fixture('%s.html' % name)
+            docx_path = self.get_path_to_fixture("%s.docx" % name)
+            expected_path = self.get_path_to_fixture("%s.html" % name)
 
-            expected = ''
+            expected = ""
             with open(expected_path) as f:
                 expected = f.read()
 
@@ -235,13 +233,14 @@ class DocXFixtureTestCaseFactory(TestCase):
             result = self.convert_docx_to_html(docx_path)
 
             self.assertHtmlEqual(result, expected)
+
         return run_test
 
     @classmethod
     def generate(cls):
         for case in cls.cases:
             test_method = cls.create(case)
-            name = str('test_%s' % case)
+            name = str("test_%s" % case)
             test_method.__name__ = name
             setattr(cls, name, test_method)
 
@@ -252,8 +251,8 @@ class DocXFixtureTestCaseFactory(TestCase):
     def assertHtmlEqual(self, actual, expected):
         if not html_is_equal(actual, expected):
             actual = prettify(actual)
-            message = 'The expected HTML did not match the actual HTML:'
-            raise AssertionError(message + '\n' + actual)
+            message = "The expected HTML did not match the actual HTML:"
+            raise AssertionError(message + "\n" + actual)
 
     def get_path_to_fixture(self, fixture):
         return os.path.join(self.cases_path, fixture)

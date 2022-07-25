@@ -1,10 +1,3 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
 from collections import defaultdict
 
 from pydocx.models import XmlCollection, XmlModel
@@ -12,7 +5,7 @@ from pydocx.openxml.wordprocessing.style import Style
 
 
 class Styles(XmlModel):
-    XML_TAG = 'styles'
+    XML_TAG = "styles"
 
     styles = XmlCollection(Style)
 

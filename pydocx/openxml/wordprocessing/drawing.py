@@ -1,17 +1,10 @@
-# coding: utf-8
-from __future__ import (
-    absolute_import,
-    print_function,
-    unicode_literals,
-)
-
-from pydocx.models import XmlModel, XmlChild
+from pydocx.models import XmlChild, XmlModel
 from pydocx.openxml.drawing.wordprocessing.anchor import Anchor
 from pydocx.openxml.drawing.wordprocessing.inline import Inline
 
 
 class Drawing(XmlModel):
-    XML_TAG = 'drawing'
+    XML_TAG = "drawing"
 
     anchor = XmlChild(type=Anchor)
     inline = XmlChild(type=Inline)

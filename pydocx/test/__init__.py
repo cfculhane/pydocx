@@ -5,7 +5,7 @@ from pydocx.test.testcases import (
 )
 
 __all__ = [
-    'DocumentGeneratorTestCase',
-    'DocXFixtureTestCaseFactory',
-    'TranslationTestCase',
+    "DocumentGeneratorTestCase",
+    "DocXFixtureTestCaseFactory",
+    "TranslationTestCase",
 ]
