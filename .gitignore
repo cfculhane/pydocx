@@ -42,7 +42,7 @@ nosetests.xml
 test.html
 testxml.html
 
-main.py
 
 docs/_build
 tests/failures/*.html
+.run
