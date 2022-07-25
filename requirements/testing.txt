@@ -1,4 +1,5 @@
 Jinja2>=2.0
-coverage==3.6
-nose==1.3.0
+coverage
+pytest
 flake8
+tox

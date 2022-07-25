@@ -10,7 +10,7 @@ from subprocess import Popen, PIPE
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
 
-from nose import SkipTest
+import pytest
 
 from pydocx.__main__ import main
 from pydocx.test.testcases import BASE_HTML
@@ -43,8 +43,9 @@ class MainTestCase(TestCase):
             ])
         self.assertEqual(result, 0)
 
+    @pytest.mark.skip('Fixture files for markdown do not exist yet')
     def test_convert_to_markdown_status_code(self):
-        raise SkipTest('Fixture files for markdown do not exist yet')
+        pass
 
     def test_convert_to_html_result(self):
         fixture_html = open('tests/fixtures/inline_tags.html').read()
@@ -59,8 +60,9 @@ class MainTestCase(TestCase):
             assert_html_equal(data, expected_html)
         self.assertEqual(result, 0)
 
+    @pytest.mark.skip("Fixture files for markdown do not exist yet")
     def test_convert_to_markdown_result(self):
-        raise SkipTest('Fixture files for markdown do not exist yet')
+        pass
 
     def test_file_handles_to_docx_are_released(self):
         # Copy the docx to another location so we can open it, and delete it
