@@ -1,0 +1,24 @@
+exclude: 'docs|scripts|node_modules|migrations|\.git|\.tox|\.idea|min\.css|.*\.js|.*\.csv|.*\.svg|^frontend/packages/old|pnpm-lock\.yaml'
+default_stages: [ commit ]
+fail_fast: true
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: mixed-line-ending
+        args: [ '--fix=lf' ]
+        description: Forces to replace line ending by the UNIX 'lf' character.
+
+  - repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/timothycrosley/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
