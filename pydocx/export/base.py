@@ -1,5 +1,5 @@
 import xml.sax.saxutils
-from typing import Callable, Iterable
+from typing import Callable, Dict, Generator, Iterable, Type, TypeVar
 
 from pydocx.constants import TWIPS_PER_POINT
 from pydocx.exceptions import MalformedDocxException
@@ -8,8 +8,18 @@ from pydocx.export.numbering_span import (
     NumberingSpan,
     NumberingSpanBuilder,
 )
+from pydocx.models import XmlModel
 from pydocx.openxml import markup_compatibility, vml, wordprocessing
-from pydocx.openxml.packaging import WordprocessingDocument
+from pydocx.openxml.packaging import (
+    MainDocumentPart,
+    NumberingDefinitionsPart,
+    StyleDefinitionsPart,
+    WordprocessingDocument,
+)
+from pydocx.openxml.vml import Rect, Shape, Textbox
+from pydocx.openxml.wordprocessing import Bookmark, Paragraph, Table, Text, TxBxContent
+
+Node = TypeVar("Node", bound=XmlModel)
 
 
 class PyDocXExporter(object):
@@ -26,9 +36,10 @@ class PyDocXExporter(object):
         self.captured_runs = None
         self.complex_field_runs = []
 
-        self.node_type_to_export_func_map = {
+        self.node_type_to_export_func_map: Dict[Type[Node], Callable] = {
             wordprocessing.Document: self.export_document,
             wordprocessing.Body: self.export_body,
+            wordprocessing.Bookmark: self.export_bookmark,
             wordprocessing.Paragraph: self.export_paragraph,
             wordprocessing.Run: self.export_run,
             wordprocessing.Text: self.export_text,
@@ -79,21 +90,21 @@ class PyDocXExporter(object):
     def document(self, document):
         self._document = document
 
-    def load_document(self):
+    def load_document(self) -> WordprocessingDocument:
         self.document = WordprocessingDocument(path=self.path)
         return self.document
 
     @property
-    def main_document_part(self):
+    def main_document_part(self) -> MainDocumentPart:
         return self.document.main_document_part
 
     @property
-    def style_definitions_part(self):
+    def style_definitions_part(self) -> StyleDefinitionsPart:
         if self.main_document_part:
             return self.main_document_part.style_definitions_part
 
     @property
-    def numbering_definitions_part(self):
+    def numbering_definitions_part(self) -> NumberingDefinitionsPart:
         if self.main_document_part:
             return self.main_document_part.numbering_definitions_part
 
@@ -119,7 +130,7 @@ class PyDocXExporter(object):
     def _first_pass_export(self):
         document = self.main_document_part.document
         if document:
-            for result in self.export_node(document):
+            for _ in self.export_node(document):
                 pass
 
     def _post_first_pass_processing(self):
@@ -203,16 +214,21 @@ class PyDocXExporter(object):
             for run in field.children:
                 run.parent = field
 
-    def export_node(self, node):
-        caller = self.node_type_to_export_func_map.get(type(node))
-        if callable(caller):
-            results = caller(node)
-            if results is not None:
-                for result in results:
-                    yield result
+    def export_node(self, node: Type[Node]) -> Generator:
+        """
+        Maps the type of node to the export method and calls it, yielding the results.
+
+        :param node: A subclass class of XmlModel, defined in self.node_type_to_export_func_map
+        :return:
+        """
+        export_method = self.node_type_to_export_func_map[type(node)]
+        results = export_method(node)
+        if results is not None:
+            for result in results:
+                yield result
 
     @property
-    def page_width(self):
+    def page_width(self) -> float:
         if self._page_width is None:
             page_width = self.calculate_page_width()
             if page_width is None:
@@ -296,13 +312,15 @@ class PyDocXExporter(object):
         results = self.yield_nested(children, self.export_node)
         if paragraph.effective_properties:
             results = self.export_paragraph_apply_properties(paragraph, results)
+        else:
+            print("No effective properties!")
         return results
 
-    def yield_paragraph_children(self, paragraph):
+    def yield_paragraph_children(self, paragraph: Paragraph):
         for child in paragraph.children:
             yield child
 
-    def get_paragraph_styles_to_apply(self, paragraph):
+    def get_paragraph_styles_to_apply(self, paragraph: Paragraph):
         properties = paragraph.effective_properties
         property_rules = [
             (properties.justification, self.export_paragraph_property_justification),
@@ -312,7 +330,7 @@ class PyDocXExporter(object):
             if actual_value:
                 yield handler
 
-    def export_paragraph_property_justification(self, paragraph, results):
+    def export_paragraph_property_justification(self, paragraph: Paragraph, results):
         return results
 
     def export_paragraph_property_indentation(self, paragraph, results):
@@ -403,7 +421,7 @@ class PyDocXExporter(object):
     def export_hyperlink(self, hyperlink):
         return self.yield_nested(hyperlink.children, self.export_node)
 
-    def export_text(self, text):
+    def export_text(self, text: Text):
         if not text.text:
             yield ""
         else:
@@ -413,10 +431,13 @@ class PyDocXExporter(object):
     def export_deleted_text(self, deleted_text):
         pass
 
+    def export_bookmark(self, bookmark: Bookmark):
+        pass
+
     def export_no_break_hyphen(self, hyphen):
         yield "-"
 
-    def export_table(self, table):
+    def export_table(self, table: Table):
         return self.yield_nested(table.rows, self.export_node)
 
     def export_table_row(self, table_row):
@@ -472,10 +493,10 @@ class PyDocXExporter(object):
     def export_footnote_reference_mark(self, footnote_reference_mark):
         pass
 
-    def export_vml_shape(self, shape):
+    def export_vml_shape(self, shape: Shape):
         return self.yield_nested(shape.children, self.export_node)
 
-    def export_vml_rect(self, rect):
+    def export_vml_rect(self, rect: Rect):
         return self.yield_nested(rect.children, self.export_node)
 
     def export_embedded_object(self, obj):
@@ -536,10 +557,10 @@ class PyDocXExporter(object):
     def export_field_code(self, field_code):
         pass
 
-    def export_textbox(self, textbox):
+    def export_textbox(self, textbox: Textbox):
         return self.yield_nested(textbox.children, self.export_node)
 
-    def export_textbox_content(self, textbox_content):
+    def export_textbox_content(self, textbox_content: TxBxContent):
         return self.yield_nested(textbox_content.children, self.export_node)
 
     def export_markup_compatibility_alternate_content(self, alternate_content):

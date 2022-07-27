@@ -127,16 +127,7 @@ Coding Standards
 * All python source files **must** be
   `PEP8 <http://legacy.python.org/dev/peps/pep-0008>`_
   compliant.
-* All python source files **must** include the following import declaration
-  at the top of the file:
 
-  .. code-block:: python
-
-      from __future__ import (
-          absolute_import,
-          print_function,
-          unicode_literals,
-      )
 
 Unicode Data
 ============
