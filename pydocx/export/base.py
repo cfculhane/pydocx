@@ -440,10 +440,10 @@ class PyDocXExporter(object):
     def export_table(self, table: Table):
         return self.yield_nested(table.rows, self.export_node)
 
-    def export_table_row(self, table_row):
+    def export_table_row(self, table_row: wordprocessing.TableRow):
         return self.yield_nested(table_row.cells, self.export_node)
 
-    def export_table_cell(self, table_cell):
+    def export_table_cell(self, table_cell: wordprocessing.TableCell):
         numbering_spans = self.yield_numbering_spans(table_cell.children)
         return self.yield_nested(numbering_spans, self.export_node)
 
